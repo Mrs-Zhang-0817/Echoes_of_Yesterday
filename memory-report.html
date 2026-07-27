@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>昨日重现 · 记忆恢复报告 · Phase 2</title>
+  <link rel="stylesheet" href="./src/ui/styles/memory_report.css">
+  <style>
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+    body {
+      display: grid;
+      place-items: center;
+      background: #2A1B12;
+    }
+    #ui-root {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+    }
+  </style>
+</head>
+<body>
+  <main id="ui-root" aria-label="昨日重现UI测试容器"></main>
+
+  <script type="module">
+    import { createMemoryReportApp } from "./src/ui/MemoryReportApp.js";
+
+    const chapterName =
+      new URLSearchParams(window.location.search).get("chapter") === "chapter_test"
+        ? "chapter_test"
+        : "chapter_01";
+
+    window.YesterdayUI = createMemoryReportApp({
+      root: document.getElementById("ui-root"),
+      assets: {
+        memoryReportTemplate: "./MemoryReport/BackgroundLayer/report_base.png",
+      },
+    });
+
+    await window.YesterdayUI.memoryReportScreen.loadChapterData(
+      `./src/data/${chapterName}.json`,
+    );
+  </script>
+</body>
+</html>

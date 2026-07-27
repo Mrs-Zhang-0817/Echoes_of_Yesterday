@@ -1,0 +1,37 @@
+{
+  "chapterId": "chapter_test",
+  "chapterLabel": "测试档案",
+  "date": "1999年5月18日",
+  "title": "风铃响起的时候",
+  "subtitle": "TEST ARCHIVE · Wind Chime",
+  "photo": {
+    "image": "./MemoryReport/PhotoLayer/chapter_memory_photo/ch4.png",
+    "alt": "用于替换测试的章节旧照片"
+  },
+  "restoredMemory": [
+    {
+      "icon": "object",
+      "title": "窗边的旧风铃",
+      "status": "restored"
+    },
+    {
+      "icon": "sound",
+      "title": "四根钢管的声音",
+      "status": "restored"
+    },
+    {
+      "icon": "name",
+      "title": "写在纸条上的名字",
+      "status": "restored"
+    }
+  ],
+  "forgottenMemory": [
+    {
+      "title": "是谁把风铃收了起来"
+    },
+    {
+      "title": "最后一次听见是什么时候"
+    }
+  ],
+  "emotionText": "风一吹，它就响。那声音我好像等了很多年。"
+}
