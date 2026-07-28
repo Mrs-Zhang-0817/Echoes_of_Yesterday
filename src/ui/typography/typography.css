@@ -1,0 +1,39 @@
+@font-face {
+  font-family: "YesterdayTitle";
+  src:
+    local("FZKai-Z03"),
+    local("STKaiti"),
+    local("KaiTi"),
+    url("../../../assets/fonts/Title.ttf") format("truetype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "YesterdayChapter";
+  src:
+    local("FZKai-Z03"),
+    local("STKaiti"),
+    local("KaiTi"),
+    url("../../../assets/fonts/Chapter.ttf") format("truetype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "YesterdayBody";
+  src:
+    local("FangSong"),
+    local("STFangsong"),
+    local("SimSun"),
+    url("../../../assets/fonts/Body.ttf") format("truetype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "YesterdayHandwriting";
+  src:
+    local("FZKai-Z03"),
+    local("STKaiti"),
+    local("KaiTi"),
+    url("../../../assets/fonts/Handwriting.ttf") format("truetype");
+  font-display: swap;
+}
