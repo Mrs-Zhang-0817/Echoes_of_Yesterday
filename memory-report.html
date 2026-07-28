@@ -57,21 +57,40 @@
 
     const { initializeMemoryReportVisualSystem } =
       await import("./src/ui/phase5/MemoryReportVisualSystem.js");
-    window.YesterdayUI.visualSystem =
-      await initializeMemoryReportVisualSystem(window.YesterdayUI);
-
+    const { MemoryRestoreStateManager } =
+      await import("./src/ui/state/MemoryRestoreStateManager.js");
+    const restoreStateManager = new MemoryRestoreStateManager();
     const restoreData =
       window.YesterdayUI.memoryReportScreen.chapterData.memoryRestore;
+    const chapterId =
+      window.YesterdayUI.memoryReportScreen.chapterData.chapterId;
+    const persistedRestoreState = restoreStateManager.read(chapterId);
+    const initialProgress = persistedRestoreState?.completed
+      ? persistedRestoreState.progress
+      : restoreData?.from;
+    window.YesterdayUI.visualSystem =
+      await initializeMemoryReportVisualSystem(window.YesterdayUI, {
+        initialProgress,
+        restoreStateManager,
+      });
+
     const autoplay =
       new URLSearchParams(window.location.search).get("autoplay") !== "0";
-    if (restoreData && autoplay) {
-      window.YesterdayUI.visualSystem.setMemoryProgress(
-        restoreData.from,
-        { silent: true },
-      );
-      window.setTimeout(() => {
-        window.YesterdayUI.visualSystem.restoreMemorySequence(restoreData);
-      }, 1000);
+    if (restoreData && persistedRestoreState?.completed) {
+      window.YesterdayUI.visualSystem.showMemoryRestoreFinalState({
+        ...restoreData,
+        to: persistedRestoreState.progress,
+        items: persistedRestoreState.items,
+      });
+    } else if (restoreData && autoplay) {
+      window.YesterdayUI.visualSystem.prepareMemoryRestore(restoreData);
+      window.YesterdayUI.visualSystem.restoreMemorySequence(restoreData)
+        .catch((error) => {
+          console.error("[MemoryRestorationSequence]", error);
+          window.YesterdayUI.visualSystem.showMemoryRestoreFinalState(
+            restoreData,
+          );
+        });
     }
   </script>
 </body>

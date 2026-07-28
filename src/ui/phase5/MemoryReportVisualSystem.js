@@ -13,7 +13,10 @@ function memoryBand(progress) {
   return "complete";
 }
 
-export async function initializeMemoryReportVisualSystem(app) {
+export async function initializeMemoryReportVisualSystem(app, {
+  initialProgress,
+  restoreStateManager = null,
+} = {}) {
   const screen = app.memoryReportScreen;
   const assetManager = new UIAssetManager();
   const textStyles = new TextStyleManager();
@@ -21,7 +24,8 @@ export async function initializeMemoryReportVisualSystem(app) {
   const paperMaterial = new PaperMaterial({ textureUrl: paperTexture });
   const photoMaterial = new PhotoMaterial();
   const visualSystem = new MemoryVisualSystem({
-    initialProgress: screen.chapterData?.clarity?.current ?? 0,
+    initialProgress:
+      initialProgress ?? screen.chapterData?.clarity?.current ?? 0,
   });
 
   textStyles.applyRoot(screen.element);
@@ -82,6 +86,7 @@ export async function initializeMemoryReportVisualSystem(app) {
     new MemoryRestorationSequence({
       visualSystem,
       screen,
+      stateManager: restoreStateManager,
     }),
   );
 

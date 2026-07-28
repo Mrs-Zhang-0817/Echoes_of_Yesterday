@@ -58,7 +58,31 @@ export class MemoryVisualSystem {
         new Error("Memory restoration sequence is not attached."),
       );
     }
-    return this.restorationSequence.play(data);
+    if (this.activeRestoration) return this.activeRestoration;
+    this.activeRestoration = this.restorationSequence.play(data)
+      .finally(() => {
+        this.activeRestoration = null;
+      });
+    return this.activeRestoration;
+  }
+
+  prepareMemoryRestore(data) {
+    this.restorationSequence?.prepare(data);
+    return this;
+  }
+
+  showMemoryRestoreFinalState(data) {
+    this.restorationSequence?.showFinalState(data);
+    return this;
+  }
+
+  revealMemoryStamp() {
+    return this.restorationSequence?.revealStamp() ?? false;
+  }
+
+  cancelMemoryRestore() {
+    this.restorationSequence?.cancel();
+    return this;
   }
 
   testRestoreSequence() {
