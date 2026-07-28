@@ -1,4 +1,4 @@
-import { MemoryButton } from "./components/Button.js";
+import { Button } from "./components/Button.js";
 import { PaperLayer } from "./components/PaperLayer.js";
 import { HoverEffects } from "./animations/HoverEffects.js";
 import { MemoryPageTransition } from "./animations/PageTransition.js";
@@ -37,7 +37,8 @@ export function initializeMemoryReportInteractions(app) {
     button.element.style.pointerEvents = "auto";
     button.element.tabIndex = 0;
     button.element.setAttribute("aria-disabled", "false");
-    return new MemoryButton(button.element, {
+    return new Button(button.element, {
+      type: "paper",
       special: index === 0,
       stateKey: button.id,
       onActivate: () => {

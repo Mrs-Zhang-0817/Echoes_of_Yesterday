@@ -69,6 +69,13 @@ export class TextStyleManager {
       root.style.setProperty(`--text-${token}-opacity`, style.opacity);
     }
     root.dataset.textStyleSystem = "typography-bible-v1";
+    this.setTextureEnabled(root, true);
+    return this;
+  }
+
+  setTextureEnabled(root, enabled = true) {
+    root.classList.toggle("typography-texture-enabled", Boolean(enabled));
+    root.dataset.typographyTexture = enabled ? "enabled" : "disabled";
     return this;
   }
 }

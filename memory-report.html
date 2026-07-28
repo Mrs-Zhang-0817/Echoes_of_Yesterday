@@ -76,14 +76,44 @@
 
     const autoplay =
       new URLSearchParams(window.location.search).get("autoplay") !== "0";
+    const shouldAutoplay =
+      restoreData && autoplay && !persistedRestoreState?.completed;
     if (restoreData && persistedRestoreState?.completed) {
       window.YesterdayUI.visualSystem.showMemoryRestoreFinalState({
         ...restoreData,
         to: persistedRestoreState.progress,
         items: persistedRestoreState.items,
       });
-    } else if (restoreData && autoplay) {
+    } else if (shouldAutoplay) {
       window.YesterdayUI.visualSystem.prepareMemoryRestore(restoreData);
+    }
+
+    const reportElement =
+      window.YesterdayUI.memoryReportScreen.element;
+    await (document.fonts?.ready ?? Promise.resolve());
+    await new Promise((resolve) => {
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        reportElement.classList.add("font-ready");
+        resolve();
+        return;
+      }
+      const finishReveal = () => {
+        window.clearTimeout(fallbackTimer);
+        reportElement.removeEventListener("transitionend", onTransitionEnd);
+        resolve();
+      };
+      const onTransitionEnd = (event) => {
+        if (event.propertyName !== "opacity") return;
+        finishReveal();
+      };
+      const fallbackTimer = window.setTimeout(finishReveal, 1000);
+      reportElement.addEventListener("transitionend", onTransitionEnd);
+      requestAnimationFrame(() => {
+        reportElement.classList.add("font-ready");
+      });
+    });
+
+    if (shouldAutoplay) {
       window.YesterdayUI.visualSystem.restoreMemorySequence(restoreData)
         .catch((error) => {
           console.error("[MemoryRestorationSequence]", error);
