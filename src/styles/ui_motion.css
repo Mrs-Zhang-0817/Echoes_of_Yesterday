@@ -1,5 +1,6 @@
 :root {
-  --motion-fast: 280ms;
+  --motion-fast: 400ms;
+  --motion-press: 130ms;
   --motion-medium: 900ms;
   --motion-important: 2000ms;
   --ease-paper: cubic-bezier(.22, .7, .25, 1);
@@ -8,56 +9,126 @@
 
 .memory-button-v4 {
   position: relative;
+  border: 0;
+  outline: 0;
+  background:
+    linear-gradient(
+      98deg,
+      rgba(126, 87, 43, .1),
+      rgba(242, 218, 166, .34) 22%,
+      rgba(209, 176, 116, .22) 77%,
+      rgba(105, 70, 35, .12)
+    ),
+    var(--paper-texture-url);
+  background-size: auto, 720px 720px;
+  background-blend-mode: multiply;
+  box-shadow:
+    inset 0 0 9px rgba(91, 57, 29, .16),
+    2px 5px 8px rgba(47, 27, 13, .2);
+  clip-path: polygon(
+    .5% 4%, 7% 1%, 18% 3%, 31% 1%, 47% 3%, 63% 1%,
+    79% 2.5%, 93% 0, 99.5% 5%, 100% 28%, 99.4% 52%,
+    100% 76%, 99.3% 96%, 91% 100%, 76% 98%, 61% 100%,
+    45% 98%, 28% 100%, 12% 98%, .4% 95%, 0 72%, .6% 48%,
+    0 24%
+  );
   transform-origin: 50% 54%;
   transition:
     transform var(--motion-fast) var(--ease-paper),
-    filter 360ms ease-out,
-    color var(--motion-fast) ease-out;
+    filter var(--motion-fast) ease-out,
+    color var(--motion-fast) ease-out,
+    opacity var(--motion-fast) ease-out,
+    box-shadow var(--motion-fast) ease-out;
   isolation: isolate;
+  cursor: pointer;
+  filter: sepia(.18) saturate(.78) brightness(.94);
 }
 
 .memory-button-v4::before {
   content: "";
   position: absolute;
   z-index: 4;
-  inset: 5% 1%;
-  border: 1px solid transparent;
+  inset: 4% 1.5%;
+  border: 0;
+  outline: 1px solid transparent;
   box-shadow: 0 0 0 transparent;
   opacity: 0;
   pointer-events: none;
   transition:
     opacity var(--motion-fast) ease-out,
-    border-color var(--motion-fast) ease-out,
+    outline-color var(--motion-fast) ease-out,
     box-shadow 360ms ease-out;
 }
 
 .memory-button-v4[data-button-state="hover"] {
   z-index: 3;
-  color: #4a2a16 !important;
-  transform: translateY(-3px) scale(1.012);
+  color: #412713 !important;
+  transform: translateY(-2px);
   filter:
-    brightness(1.09)
-    saturate(1.04)
-    drop-shadow(0 9px 7px rgba(47, 26, 12, .34));
+    sepia(.08)
+    brightness(1.1)
+    saturate(1.03)
+    drop-shadow(0 7px 6px rgba(47, 26, 12, .3));
+  box-shadow:
+    inset 0 0 12px rgba(255, 225, 163, .2),
+    2px 7px 10px rgba(47, 27, 13, .24);
 }
 .memory-button-v4[data-button-state="hover"]::before {
   opacity: .82;
-  border-color: rgba(221, 166, 66, .72);
+  outline-color: rgba(221, 166, 66, .72);
   box-shadow:
     inset 0 0 13px rgba(255, 210, 108, .18),
     0 0 12px rgba(226, 164, 56, .26);
 }
 .memory-button-v4[data-button-state="pressed"] {
-  transform: translateY(2px) scale(.985, .97);
+  transform: translateY(1px) scale(.992, .98);
   filter:
-    brightness(.98)
+    sepia(.12)
+    brightness(.97)
+    saturate(.9)
     drop-shadow(0 2px 2px rgba(47, 26, 12, .2));
-  transition-duration: 180ms;
+  box-shadow:
+    inset 0 2px 7px rgba(70, 42, 20, .2),
+    1px 2px 3px rgba(47, 27, 13, .16);
+  transition-duration: var(--motion-press);
+}
+.memory-button-v4[data-button-state="pressed"]::before {
+  opacity: .38;
+  outline-color: rgba(203, 146, 48, .42);
+  box-shadow: inset 0 0 7px rgba(244, 190, 82, .14);
 }
 .memory-button-v4[data-button-state="disabled"] {
   cursor: not-allowed;
-  filter: grayscale(.5) brightness(.82);
-  opacity: .58;
+  filter: grayscale(.62) sepia(.12) saturate(.46) brightness(.8);
+  opacity: .52;
+  transform: none;
+}
+.memory-button-v4[data-button-state="disabled"]::before {
+  opacity: 0;
+}
+
+.memory-button-v4[data-button-state="completed"] {
+  color: #52603a !important;
+  cursor: pointer;
+  filter: sepia(.14) saturate(.78) brightness(.98);
+  transform: none;
+}
+.memory-button-v4.is-button-completed::after {
+  content: "✓ 已归档";
+  position: absolute;
+  z-index: 5;
+  right: 5%;
+  top: 12%;
+  padding: .08em .32em;
+  color: rgba(73, 91, 48, .78);
+  outline: 1px solid currentColor;
+  font-family: var(--text-system-font, serif);
+  font-size: clamp(7px, .62vw, 10px);
+  line-height: 1.2;
+  letter-spacing: .06em;
+  opacity: .82;
+  transform: rotate(-5deg);
+  pointer-events: none;
 }
 
 .memory-button-v4--awakening[data-button-state="hover"] {
@@ -69,7 +140,7 @@
     drop-shadow(0 10px 8px rgba(47, 26, 12, .35));
 }
 .memory-button-v4--awakening[data-button-state="hover"]::before {
-  border-color: rgba(255, 202, 89, .92);
+  outline-color: rgba(255, 202, 89, .92);
   box-shadow:
     inset 0 0 18px rgba(255, 219, 125, .28),
     0 0 16px rgba(246, 181, 61, .48);

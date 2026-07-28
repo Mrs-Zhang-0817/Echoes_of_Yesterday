@@ -60,6 +60,9 @@ export class FontManager {
 
   async loadFonts() {
     await this.loadAll();
+    if (document.fonts?.ready) {
+      await document.fonts.ready;
+    }
     return this;
   }
 }
