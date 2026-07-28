@@ -25,7 +25,7 @@ export class ForgottenMemoryList extends UIComponent {
         id: `${this.id}-item-${index + 1}`,
         type: "forgotten",
       });
-      component.setData(item);
+      component.setData(item, index);
       this.itemsElement.appendChild(component.element);
     });
     this.element.dataset.count = String(items.length);

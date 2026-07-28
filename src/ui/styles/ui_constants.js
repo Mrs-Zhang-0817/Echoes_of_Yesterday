@@ -1,3 +1,8 @@
+import {
+  TypographyToken,
+  getTypographyFamily,
+} from "../typography/TypographyConfig.js";
+
 export const UICanvas = Object.freeze({
   width: 1280,
   height: 720,
@@ -25,48 +30,50 @@ export const UIColor = Object.freeze({
 export const MemoryReportLabels = Object.freeze({
   restored: "已恢复的记忆",
   forgotten: "尚未想起",
+  archived: "已归档",
+  clarity: "记忆清晰度",
   emotion: "心里的话：",
   buttons: Object.freeze(["继续昨日", "查看记忆档案", "返回主界面"]),
 });
 
 export const UITypography = Object.freeze({
   TitleFont: Object.freeze({
-    family: '"STKaiti", "KaiTi", serif',
+    family: getTypographyFamily(TypographyToken.TITLE_FONT),
     size: "clamp(38px, 5vw, 64px)",
     weight: "800",
     lineHeight: "1",
     letterSpacing: "-0.02em",
   }),
   ChapterFont: Object.freeze({
-    family: '"KaiTi", "STKaiti", serif',
+    family: getTypographyFamily(TypographyToken.CHAPTER_FONT),
     size: "clamp(26px, 3vw, 38px)",
     weight: "600",
     lineHeight: "1.2",
     letterSpacing: "0",
   }),
   BodyFont: Object.freeze({
-    family: '"SimSun", "Microsoft YaHei", serif',
+    family: getTypographyFamily(TypographyToken.BODY_FONT),
     size: "clamp(18px, 1.8vw, 24px)",
     weight: "400",
     lineHeight: "1.7",
     letterSpacing: "0",
   }),
   HandwritingFont: Object.freeze({
-    family: '"KaiTi", "STKaiti", serif',
+    family: getTypographyFamily(TypographyToken.HANDWRITING_FONT),
     size: "clamp(20px, 2vw, 28px)",
     weight: "400",
     lineHeight: "1.35",
     letterSpacing: "0.02em",
   }),
   SystemFont: Object.freeze({
-    family: '"Microsoft YaHei", Arial, sans-serif',
+    family: getTypographyFamily(TypographyToken.SYSTEM_FONT),
     size: "clamp(14px, 1.4vw, 18px)",
     weight: "400",
     lineHeight: "1.35",
     letterSpacing: "0.18em",
   }),
   ButtonFont: Object.freeze({
-    family: '"KaiTi", "STKaiti", serif',
+    family: getTypographyFamily(TypographyToken.CHAPTER_FONT),
     size: "clamp(18px, 2vw, 26px)",
     weight: "500",
     lineHeight: "1.15",
