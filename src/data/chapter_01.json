@@ -19,6 +19,16 @@
     "current": 15
   },
   "memoryItemsSource": "./assets/memory_items/chapter01/memory_items.json",
+  "memoryRestore": {
+    "from": 5,
+    "to": 15,
+    "duration": 6200,
+    "items": [
+      "memory_001",
+      "memory_002"
+    ],
+    "emotion": "她背着书包回头朝我笑。"
+  },
   "restoredMemory": [
     {
       "icon": "photo",

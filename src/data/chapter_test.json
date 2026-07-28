@@ -19,18 +19,31 @@
     "before": 15,
     "current": 32
   },
+  "memoryRestore": {
+    "from": 15,
+    "to": 32,
+    "duration": 6500,
+    "items": [
+      "memory_001",
+      "memory_002"
+    ],
+    "emotion": "风铃的声音，正在从旧日里回来。"
+  },
   "restoredMemory": [
     {
+      "id": "memory_001",
       "icon": "object",
       "title": "窗边的旧风铃",
       "status": "restored"
     },
     {
+      "id": "memory_002",
       "icon": "sound",
       "title": "四根钢管的声音",
       "status": "restored"
     },
     {
+      "id": "memory_003",
       "icon": "name",
       "title": "写在纸条上的名字",
       "status": "restored"
