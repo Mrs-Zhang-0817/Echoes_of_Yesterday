@@ -42,6 +42,14 @@
   .memory-item__title,
 .memory-restoration-sequence.is-sequence-running
   .emotion-text {
+  opacity: 0;
+}
+
+.memory-restoration-sequence.is-sequence-running
+  .memory-summary,
+.memory-restoration-sequence.is-sequence-running
+  .memory-list--restored
+  .memory-item__title {
   opacity: .38;
   filter: blur(.35px) contrast(.78);
   transition:
@@ -55,10 +63,13 @@
 .memory-restoration-sequence.is-text-revealed
   .memory-list--restored
   .memory-item__title,
-.memory-restoration-sequence.is-text-revealed
+.memory-restoration-sequence.is-emotion-revealed
   .emotion-text {
   opacity: 1;
   filter: blur(0) contrast(1);
+  transition:
+    opacity 800ms ease-out,
+    filter 800ms ease-out;
 }
 
 .memory-restoration-sequence.is-sequence-running:not(.is-photo-revealed)

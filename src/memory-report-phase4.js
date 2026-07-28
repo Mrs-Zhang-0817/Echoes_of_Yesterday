@@ -1,6 +1,5 @@
 import { MemoryButton } from "./components/Button.js";
 import { PaperLayer } from "./components/PaperLayer.js";
-import { MemoryStamp } from "./components/MemoryStamp.js";
 import { HoverEffects } from "./animations/HoverEffects.js";
 import { MemoryPageTransition } from "./animations/PageTransition.js";
 
@@ -34,15 +33,11 @@ export function initializeMemoryReportInteractions(app) {
     screen.photoFrame.element.classList.add("is-restored");
   }
 
-  const stampElement = screen.restoredList.archiveElement;
-  const stamp = new MemoryStamp(stampElement);
-  stampElement.classList.remove("is-stamped");
-
-  screen.buttons.forEach((button, index) => {
+  const buttonControllers = screen.buttons.map((button, index) => {
     button.element.style.pointerEvents = "auto";
     button.element.tabIndex = 0;
     button.element.setAttribute("aria-disabled", "false");
-    new MemoryButton(button.element, {
+    return new MemoryButton(button.element, {
       special: index === 0,
       stateKey: button.id,
       onActivate: () => {
@@ -56,13 +51,27 @@ export function initializeMemoryReportInteractions(app) {
             `./memory-report.html?chapter=${encodeURIComponent(nextChapter)}`,
           );
         }
-        if (index === 1) stamp.reveal({ replay: true });
+        if (index === 1) {
+          app.visualSystem?.revealMemoryStamp();
+        }
         if (index === 2) transition.navigate("./index.html");
       },
     });
   });
 
+  const setInteractionLocked = (locked) => {
+    screen.element.dataset.memoryRestoreLocked = String(locked);
+    buttonControllers.forEach((button) => button.setDisabled(locked));
+  };
+  screen.element.addEventListener("MEMORY_RESTORE_LOCK", () => {
+    setInteractionLocked(true);
+  });
+  screen.element.addEventListener("MEMORY_RESTORE_UNLOCK", () => {
+    setInteractionLocked(false);
+  });
+
   window.addEventListener("pagehide", () => {
+    app.visualSystem?.cancelMemoryRestore();
     sessionStorage.setItem(
       "yesterday:last-report",
       screen.chapterData?.chapterId ?? "chapter_01",

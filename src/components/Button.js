@@ -40,6 +40,21 @@ export class MemoryButton {
     return this;
   }
 
+  setDisabled(disabled) {
+    const isDisabled = Boolean(disabled);
+    this.element.setAttribute("aria-disabled", String(isDisabled));
+    this.element.style.pointerEvents = isDisabled ? "none" : "auto";
+    this.element.tabIndex = isDisabled ? -1 : 0;
+    this.pressed = false;
+    return this.setState(
+      isDisabled ? ButtonState.DISABLED : ButtonState.NORMAL,
+    );
+  }
+
+  isDisabled() {
+    return this.element.getAttribute("aria-disabled") === "true";
+  }
+
   listen(type, handler) {
     this.element.addEventListener(type, handler);
     this.boundHandlers.push([type, handler]);
@@ -56,11 +71,13 @@ export class MemoryButton {
       this.setState(ButtonState.NORMAL);
     });
     this.listen("pointerdown", (event) => {
+      if (this.isDisabled()) return;
       this.pressed = true;
       this.element.setPointerCapture?.(event.pointerId);
       this.setState(ButtonState.PRESSED);
     });
     this.listen("pointerup", (event) => {
+      if (this.isDisabled()) return;
       if (!this.pressed) return;
       this.pressed = false;
       const bounds = this.element.getBoundingClientRect();
@@ -88,11 +105,13 @@ export class MemoryButton {
     this.listen("focus", () => this.setState(ButtonState.HOVER));
     this.listen("blur", () => this.setState(ButtonState.NORMAL));
     this.listen("keydown", (event) => {
+      if (this.isDisabled()) return;
       if (event.key !== "Enter" && event.key !== " ") return;
       event.preventDefault();
       this.setState(ButtonState.PRESSED);
     });
     this.listen("keyup", (event) => {
+      if (this.isDisabled()) return;
       if (event.key !== "Enter" && event.key !== " ") return;
       event.preventDefault();
       this.setState(ButtonState.HOVER);
