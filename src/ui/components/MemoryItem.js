@@ -1,4 +1,5 @@
 import { UIComponent } from "../core/UIComponent.js";
+import { MemoryThumbnail } from "./MemoryThumbnail.js";
 
 const ICON_LABELS = Object.freeze({
   photo: "影",
@@ -18,9 +19,10 @@ export class MemoryItem extends UIComponent {
     });
 
     this.type = type;
-    this.iconElement = document.createElement("span");
-    this.iconElement.className = "memory-item__icon";
-    this.iconElement.setAttribute("aria-hidden", "true");
+    this.thumbnail = new MemoryThumbnail({
+      id: `${id}-thumbnail`,
+    });
+    this.iconElement = this.thumbnail.element;
 
     this.titleElement = document.createElement("span");
     this.titleElement.className = "memory-item__title";
@@ -36,11 +38,19 @@ export class MemoryItem extends UIComponent {
     );
   }
 
-  setData(item) {
+  setData(item, index = 0) {
     const iconKey = this.type === "forgotten" ? "unknown" : item.icon;
-    this.iconElement.textContent = ICON_LABELS[iconKey] ?? "记";
     this.iconElement.dataset.icon = iconKey ?? "memory";
+    if (this.type === "forgotten") {
+      this.thumbnail.placeholderElement.textContent =
+        ICON_LABELS.unknown;
+      this.thumbnail.imageElement.removeAttribute("src");
+      this.thumbnail.element.classList.add("is-placeholder");
+    } else {
+      this.thumbnail.setData(item, index);
+    }
     this.titleElement.textContent = item.title ?? "";
+    this.titleElement.title = item.description ?? item.title ?? "";
     this.markElement.textContent = this.type === "restored" ? "✓" : "？";
     this.element.dataset.status =
       this.type === "restored" ? item.status ?? "restored" : "forgotten";

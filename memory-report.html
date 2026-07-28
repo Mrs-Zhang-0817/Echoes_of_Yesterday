@@ -4,7 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>昨日重现 · 记忆恢复报告 · Phase 2</title>
+  <link rel="stylesheet" href="./src/ui/typography/typography.css">
   <link rel="stylesheet" href="./src/ui/styles/memory_report.css">
+  <link rel="stylesheet" href="./src/ui/styles/ui_materials.css">
+  <link rel="stylesheet" href="./src/styles/ui_motion.css">
   <style>
     * { box-sizing: border-box; }
     html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
@@ -32,16 +35,29 @@
         ? "chapter_test"
         : "chapter_01";
 
+    const { UIAssetManager } = await import("./src/ui/core/UIAssetManager.js");
+    const uiAssets = new UIAssetManager();
     window.YesterdayUI = createMemoryReportApp({
       root: document.getElementById("ui-root"),
       assets: {
-        memoryReportTemplate: "./MemoryReport/BackgroundLayer/report_base.png",
+        memoryReportTemplate:
+          await uiAssets.loadImageSource("memoryReportBackground"),
       },
     });
+    await window.YesterdayUI.fontManager.loadFonts();
 
     await window.YesterdayUI.memoryReportScreen.loadChapterData(
       `./src/data/${chapterName}.json`,
     );
+
+    const { initializeMemoryReportInteractions } =
+      await import("./src/memory-report-phase4.js");
+    initializeMemoryReportInteractions(window.YesterdayUI);
+
+    const { initializeMemoryReportVisualSystem } =
+      await import("./src/ui/phase5/MemoryReportVisualSystem.js");
+    window.YesterdayUI.visualSystem =
+      await initializeMemoryReportVisualSystem(window.YesterdayUI);
   </script>
 </body>
 </html>

@@ -2,6 +2,11 @@ import { UIManager } from "./core/UIManager.js";
 import { FontManager, FontRole } from "./core/FontManager.js";
 import { AssetRegistry, AssetCategory } from "./core/AssetRegistry.js";
 import { MemoryReportScreen } from "./screens/MemoryReportScreen.js";
+import {
+  TypographyConfig,
+  TypographyToken,
+  getTypographyFamily,
+} from "./typography/TypographyConfig.js";
 
 export function createMemoryReportApp({
   root,
@@ -22,27 +27,21 @@ export function createMemoryReportApp({
   );
 
   const fontManager = new FontManager();
-  fontManager
-    .register(FontRole.TITLE, {
-      name: "TitleFont",
-      family: fonts.TitleFont ?? '"STKaiti", "KaiTi", serif',
-    })
-    .register(FontRole.CHAPTER, {
-      name: "ChapterFont",
-      family: fonts.ChapterFont ?? '"KaiTi", "STKaiti", serif',
-    })
-    .register(FontRole.BODY, {
-      name: "BodyFont",
-      family: fonts.BodyFont ?? '"SimSun", "Microsoft YaHei", serif',
-    })
-    .register(FontRole.HANDWRITING, {
-      name: "HandwritingFont",
-      family: fonts.HandwritingFont ?? '"KaiTi", "STKaiti", serif',
-    })
-    .register(FontRole.SYSTEM, {
-      name: "SystemFont",
-      family: fonts.SystemFont ?? '"Microsoft YaHei", Arial, sans-serif',
+  const fontTokens = [
+    [FontRole.TITLE, TypographyToken.TITLE_FONT],
+    [FontRole.CHAPTER, TypographyToken.CHAPTER_FONT],
+    [FontRole.BODY, TypographyToken.BODY_FONT],
+    [FontRole.HANDWRITING, TypographyToken.HANDWRITING_FONT],
+    [FontRole.SYSTEM, TypographyToken.SYSTEM_FONT],
+  ];
+  fontTokens.forEach(([role, token]) => {
+    const config = TypographyConfig[token];
+    fontManager.register(role, {
+      ...config,
+      name: config.role,
+      family: fonts[config.role] ?? getTypographyFamily(token),
     });
+  });
 
   const uiManager = new UIManager({
     root,

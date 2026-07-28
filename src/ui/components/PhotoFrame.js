@@ -27,13 +27,18 @@ export class PhotoFrame extends UIComponent {
     image.src = source;
     image.alt = alt;
     image.draggable = false;
-    Object.assign(image.style, {
-      width: "100%",
-      height: "100%",
-      objectFit: "cover",
-      display: "block",
-    });
-    this.element.appendChild(image);
+    const imageLayer = document.createElement("div");
+    imageLayer.className = "photo-frame__image-layer";
+    imageLayer.appendChild(image);
+
+    const oldFilter = document.createElement("i");
+    oldFilter.className = "photo-frame__old-filter";
+    const grain = document.createElement("i");
+    grain.className = "photo-frame__grain";
+    const border = document.createElement("i");
+    border.className = "photo-frame__paper-border";
+
+    this.element.append(imageLayer, oldFilter, grain, border);
     this.element.dataset.phase = "content";
     return this;
   }

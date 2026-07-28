@@ -9,6 +9,9 @@ import { RestoredMemoryList } from "../components/RestoredMemoryList.js";
 import { ForgottenMemoryList } from "../components/ForgottenMemoryList.js";
 import { EmotionText } from "../components/EmotionText.js";
 import { DateStamp } from "../components/DateStamp.js";
+import { MemorySummary } from "../components/MemorySummary.js";
+import { MemoryClarity } from "../components/MemoryClarity.js";
+import { MemoryItemDataSource } from "../data/MemoryItemDataSource.js";
 import {
   UICanvas,
   UIColor,
@@ -50,6 +53,8 @@ function validateChapterData(data) {
     "restoredMemory",
     "forgottenMemory",
     "emotionText",
+    "reportSummary",
+    "clarity",
   ];
 
   for (const key of requiredKeys) {
@@ -80,6 +85,7 @@ export class MemoryReportScreen extends UIComponent {
     this.regions = new Map();
     this.buttons = [];
     this.chapterData = null;
+    this.memoryItemDataSource = new MemoryItemDataSource();
 
     this.setLayout({
       position: "relative",
@@ -212,15 +218,25 @@ export class MemoryReportScreen extends UIComponent {
     this.regions.set("CenterPanel", this.centerPanel);
     this.regions.set("RightPanel", this.rightPanel);
 
+    this.memorySummary = new MemorySummary({
+      id: "memory-report-summary",
+    });
+    this.memoryClarity = new MemoryClarity({
+      id: "memory-report-clarity",
+      label: MemoryReportLabels.clarity,
+    });
     this.emotionText = new EmotionText({
       id: "memory-report-emotion-text",
       label: MemoryReportLabels.emotion,
     });
+    this.leftPanel.addChild(this.memorySummary);
+    this.leftPanel.addChild(this.memoryClarity);
     this.leftPanel.addChild(this.emotionText);
 
     this.restoredList = new RestoredMemoryList({
       id: "memory-report-restored-list",
       heading: MemoryReportLabels.restored,
+      archiveLabel: MemoryReportLabels.archived,
     });
     this.centerPanel.addChild(this.restoredList);
 
@@ -298,6 +314,10 @@ export class MemoryReportScreen extends UIComponent {
 
     const data = await response.json();
     validateChapterData(data);
+    data.restoredMemory = await this.memoryItemDataSource.load(
+      data.memoryItemsSource,
+      data.restoredMemory,
+    );
     this.updateUI(data);
     return this.render();
   }
@@ -323,8 +343,18 @@ export class MemoryReportScreen extends UIComponent {
     this.photoFrame.setImage(photoAsset.source, data.photo.alt ?? data.title);
     this.restoredList.setItems(data.restoredMemory);
     this.forgottenList.setItems(data.forgottenMemory);
+    this.memorySummary.setData(data.reportSummary);
+    this.memoryClarity.setData(data.clarity);
     this.emotionText.setText(data.emotionText);
     this.dateStamp.setDate(data.date);
+    this.element.dispatchEvent(
+      new CustomEvent("memory-report:update", {
+        detail: {
+          chapterId: data.chapterId,
+          memoryProgress: data.clarity?.current ?? 0,
+        },
+      }),
+    );
     return this;
   }
 
@@ -335,6 +365,15 @@ export class MemoryReportScreen extends UIComponent {
 
     this.element.dataset.chapterId = this.chapterData.chapterId;
     this.element.dataset.renderState = "ready";
+    return this;
+  }
+
+  bindVisualSystem(visualSystem, onProgressChange) {
+    this.releaseVisualSystem?.();
+    this.releaseVisualSystem = visualSystem.subscribe((value) => {
+      onProgressChange(value);
+    });
+    this.visualSystem = visualSystem;
     return this;
   }
 }
