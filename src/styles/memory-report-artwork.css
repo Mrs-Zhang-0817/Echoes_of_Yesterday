@@ -1,0 +1,228 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: #2a1b12;
+}
+
+body,
+#artwork-report-root {
+  display: grid;
+  place-items: center;
+}
+
+#artwork-report-root {
+  width: 100%;
+  height: 100%;
+}
+
+.artwork-memory-report {
+  position: relative;
+  width: min(100vw, calc(100svh * 16 / 9));
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  isolation: isolate;
+  opacity: 0;
+  transition: opacity 400ms ease;
+}
+
+.artwork-memory-report.is-artwork-ready {
+  opacity: 1;
+}
+
+.artwork-memory-report__image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.artwork-memory-report__cover-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.artwork-progress {
+  position: absolute;
+  z-index: 3;
+  display: grid;
+  grid-template-rows: 19% 39% 15% 17%;
+  align-content: center;
+  color: #543522;
+  font-family:
+    "YesterdayChapter", "STKaiti", "KaiTi", "楷体", serif;
+  mix-blend-mode: multiply;
+  text-shadow:
+    .2px .15px .2px rgba(65, 39, 21, .45),
+    0 0 .45px rgba(111, 76, 45, .2);
+}
+
+.artwork-progress h2 {
+  margin: 0;
+  text-align: center;
+  font-size: clamp(12px, 1.42vw, 24px);
+  font-weight: 400;
+  letter-spacing: .11em;
+}
+
+.artwork-progress__values {
+  position: relative;
+}
+
+.artwork-progress__value {
+  position: absolute;
+  top: 0;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  line-height: 1;
+  transform: translate(-50%, -50%);
+}
+
+.artwork-progress__value--before {
+  left: var(--percentage-left-x);
+  top: var(--percentage-left-y);
+}
+
+.artwork-progress__value--current {
+  left: var(--percentage-right-x);
+  top: var(--percentage-right-y);
+}
+
+.artwork-progress__value strong {
+  color: #593018;
+  font-family:
+    "YesterdayBody", "FangSong", "STFangsong", "仿宋", serif;
+  font-size: clamp(21px, 2.25vw, 38px);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.artwork-progress__value span {
+  margin-top: 7%;
+  font-size: clamp(8px, .78vw, 13px);
+  letter-spacing: .1em;
+}
+
+.artwork-progress__arrow {
+  position: absolute;
+  left: 50%;
+  top: 25%;
+  font-size: clamp(24px, 2.4vw, 40px);
+  transform: translate(-50%, -50%);
+}
+
+.artwork-progress__track {
+  position: relative;
+  align-self: center;
+  height: clamp(8px, .82vw, 14px);
+  overflow: hidden;
+  border: 1px solid rgba(96, 62, 32, .42);
+  border-radius: 999px;
+  background: rgba(231, 208, 165, .38);
+  box-shadow:
+    inset 0 1px 3px rgba(68, 42, 22, .2),
+    0 1px 0 rgba(255, 239, 199, .3);
+}
+
+.artwork-progress__fill {
+  width: 0;
+  height: 100%;
+  background:
+    linear-gradient(90deg, #75431f, #b57c2c 60%, #d3aa57);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 225, 150, .18),
+    1px 0 2px rgba(96, 56, 26, .25);
+  transition: width 1800ms cubic-bezier(.22, .7, .25, 1);
+}
+
+.artwork-progress__scale {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid rgba(90, 56, 34, .25);
+  color: #614b37;
+  font-family:
+    "YesterdayBody", "FangSong", "STFangsong", "仿宋", serif;
+  font-size: clamp(7px, .72vw, 12px);
+}
+
+.artwork-progress__scale span {
+  position: relative;
+  padding-top: 2%;
+  transform: translateX(-50%);
+}
+
+.artwork-progress__scale span:first-child {
+  transform: none;
+}
+
+.artwork-progress__scale span:last-child {
+  transform: translateX(25%);
+}
+
+.artwork-progress__scale span::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -5px;
+  width: 1px;
+  height: 5px;
+  background: rgba(90, 56, 34, .45);
+}
+
+.artwork-report-button {
+  position: absolute;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  color: #593b24;
+  font-family:
+    "YesterdayChapter", "STKaiti", "KaiTi", "楷体", serif;
+  font-size: clamp(16px, 1.75vw, 29px);
+  letter-spacing: .08em;
+  background:
+    linear-gradient(
+      100deg,
+      rgba(213, 181, 121, .94),
+      rgba(241, 218, 170, .96) 50%,
+      rgba(198, 157, 96, .93)
+    );
+  box-shadow:
+    inset 0 0 13px rgba(96, 60, 29, .14),
+    2px 6px 9px rgba(49, 28, 13, .2);
+}
+
+.artwork-report-button.memory-button-v4--artwork {
+  clip-path: polygon(
+    .4% 5%, 8% 1%, 22% 3%, 38% 1%, 55% 3%, 72% 1%,
+    91% 2%, 99.6% 6%, 100% 94%, 91% 99%, 72% 97%, 51% 100%,
+    29% 98%, 9% 100%, .4% 94%
+  );
+}
+
+.artwork-memory-report.is-artwork-archived
+  .artwork-report-button:nth-of-type(2) {
+  filter: brightness(1.04) saturate(.9);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .artwork-memory-report,
+  .artwork-progress__fill {
+    transition-duration: 1ms !important;
+  }
+}
