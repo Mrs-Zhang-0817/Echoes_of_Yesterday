@@ -5,6 +5,7 @@ import { PaperMaterial } from "../materials/PaperMaterial.js";
 import { PhotoMaterial } from "../materials/PhotoMaterial.js";
 import { UIPostProcess } from "../effects/UIPostProcess.js";
 import { MemoryVisualSystem } from "./MemoryVisualSystem.js";
+import { MemoryRestorationSequence } from "../animations/MemoryRestorationSequence.js";
 
 function memoryBand(progress) {
   if (progress < 30) return "forgotten";
@@ -76,6 +77,13 @@ export async function initializeMemoryReportVisualSystem(app) {
   screen.element.addEventListener("memory-report:update", (event) => {
     visualSystem.setMemoryProgress(event.detail?.memoryProgress ?? 0);
   });
+
+  visualSystem.attachRestorationSequence(
+    new MemoryRestorationSequence({
+      visualSystem,
+      screen,
+    }),
+  );
 
   return Object.assign(visualSystem, {
     assetManager,

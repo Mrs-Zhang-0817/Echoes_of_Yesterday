@@ -30,18 +30,44 @@ export class MemoryVisualSystem {
     return this;
   }
 
-  setMemoryProgress(value) {
+  setMemoryProgress(value, { silent = false } = {}) {
     const previous = this.currentProgress;
     const progress = normalizeProgress(value);
     this.currentProgress = progress;
-    console.info(
-      `[MemoryVisualSystem]\nProgress: ${previous} -> ${progress}\nUpdating UI...`,
-    );
+    if (!silent) {
+      console.info(
+        `[MemoryVisualSystem]\nProgress: ${previous} -> ${progress}\nUpdating UI...`,
+      );
+    }
     this.emitProgressChange(progress);
     return this;
   }
 
   getMemoryProgress() {
     return this.currentProgress;
+  }
+
+  attachRestorationSequence(sequence) {
+    this.restorationSequence = sequence;
+    return this;
+  }
+
+  restoreMemorySequence(data) {
+    if (!this.restorationSequence) {
+      return Promise.reject(
+        new Error("Memory restoration sequence is not attached."),
+      );
+    }
+    return this.restorationSequence.play(data);
+  }
+
+  testRestoreSequence() {
+    return this.restoreMemorySequence({
+      from: 15,
+      to: 80,
+      duration: 6500,
+      restoredItems: ["memory_001", "memory_002", "memory_003"],
+      emotion: "那些失去颜色的日子，正在一点点回来。",
+    });
   }
 }

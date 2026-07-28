@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="./src/ui/typography/typography.css">
   <link rel="stylesheet" href="./src/ui/styles/memory_report.css">
   <link rel="stylesheet" href="./src/ui/styles/ui_materials.css">
+  <link rel="stylesheet" href="./src/ui/styles/memory_restoration.css">
   <link rel="stylesheet" href="./src/styles/ui_motion.css">
   <style>
     * { box-sizing: border-box; }
@@ -58,6 +59,20 @@
       await import("./src/ui/phase5/MemoryReportVisualSystem.js");
     window.YesterdayUI.visualSystem =
       await initializeMemoryReportVisualSystem(window.YesterdayUI);
+
+    const restoreData =
+      window.YesterdayUI.memoryReportScreen.chapterData.memoryRestore;
+    const autoplay =
+      new URLSearchParams(window.location.search).get("autoplay") !== "0";
+    if (restoreData && autoplay) {
+      window.YesterdayUI.visualSystem.setMemoryProgress(
+        restoreData.from,
+        { silent: true },
+      );
+      window.setTimeout(() => {
+        window.YesterdayUI.visualSystem.restoreMemorySequence(restoreData);
+      }, 1000);
+    }
   </script>
 </body>
 </html>

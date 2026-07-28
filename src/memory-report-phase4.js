@@ -36,7 +36,7 @@ export function initializeMemoryReportInteractions(app) {
 
   const stampElement = screen.restoredList.archiveElement;
   const stamp = new MemoryStamp(stampElement);
-  stamp.reveal();
+  stampElement.classList.remove("is-stamped");
 
   screen.buttons.forEach((button, index) => {
     button.element.style.pointerEvents = "auto";
