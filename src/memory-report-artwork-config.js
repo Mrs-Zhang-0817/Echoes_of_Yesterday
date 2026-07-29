@@ -98,3 +98,49 @@ export function getNextArtworkChapter(chapterId) {
     index < 0 ? 0 : (index + 1) % ARTWORK_CHAPTER_ORDER.length
   ];
 }
+
+const CONFIG_SOURCE = "./src/ui/memory-report-config.json";
+
+export async function loadArtworkMemoryReportConfig(
+  chapterId,
+  overrides = {},
+) {
+  try {
+    const response = await fetch(CONFIG_SOURCE);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const documentConfig = await response.json();
+    const resolvedChapter =
+      documentConfig.chapters?.[chapterId] ??
+      documentConfig.chapters?.[documentConfig.defaultChapter];
+    if (!resolvedChapter) throw new Error("No configured chapters");
+
+    const order = documentConfig.chapterOrder ?? [];
+    const index = order.indexOf(chapterId);
+    return Object.freeze({
+      ...resolvedChapter,
+      chapterId: resolvedChapter === documentConfig.chapters?.[chapterId]
+        ? chapterId
+        : documentConfig.defaultChapter,
+      memoryFrom: overrides.memoryFrom ?? resolvedChapter.memoryFrom,
+      memoryTo: overrides.memoryTo ?? resolvedChapter.memoryTo,
+      progressArea: documentConfig.progressArea,
+      percentagePosition: documentConfig.percentagePosition,
+      buttonAreas: documentConfig.buttonAreas,
+      nextChapter: order[
+        index < 0 ? 0 : (index + 1) % order.length
+      ],
+    });
+  } catch (error) {
+    console.warn(
+      "[ArtworkMemoryReport] Using embedded baseline config.",
+      error,
+    );
+    const fallback = getArtworkMemoryReportConfig(chapterId);
+    return Object.freeze({
+      ...fallback,
+      memoryFrom: overrides.memoryFrom ?? fallback.memoryFrom,
+      memoryTo: overrides.memoryTo ?? fallback.memoryTo,
+      nextChapter: getNextArtworkChapter(fallback.chapterId),
+    });
+  }
+}

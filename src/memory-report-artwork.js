@@ -126,9 +126,9 @@ class ArtworkMemoryProgress {
 }
 
 export class ArtworkMemoryReportApp {
-  constructor({ root, chapterId }) {
+  constructor({ root, chapterId, config = null }) {
     this.root = root;
-    this.config = getArtworkMemoryReportConfig(chapterId);
+    this.config = config ?? getArtworkMemoryReportConfig(chapterId);
     sessionStorage.removeItem("yesterday:page-transition");
     this.buttons = [];
     this.build();
@@ -190,7 +190,9 @@ export class ArtworkMemoryReportApp {
 
   handleButton(action) {
     if (action === "continue") {
-      const nextChapter = getNextArtworkChapter(this.config.chapterId);
+      const nextChapter =
+        this.config.nextChapter ??
+        getNextArtworkChapter(this.config.chapterId);
       window.location.assign(
         `./memory-report-artwork.html?chapter=${nextChapter}`,
       );

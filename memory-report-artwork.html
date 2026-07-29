@@ -14,12 +14,26 @@
     import {
       createArtworkMemoryReportApp,
     } from "./src/memory-report-artwork.js";
+    import {
+      loadArtworkMemoryReportConfig,
+    } from "./src/memory-report-artwork-config.js";
 
     const params = new URLSearchParams(window.location.search);
     const chapterId = params.get("chapter") ?? "chapter_02";
+    const parseProgress = (name) => {
+      const value = params.get(name);
+      if (value === null) return undefined;
+      const number = Number(value);
+      return Number.isFinite(number) ? number : undefined;
+    };
+    const config = await loadArtworkMemoryReportConfig(chapterId, {
+      memoryFrom: parseProgress("memoryFrom"),
+      memoryTo: parseProgress("memoryTo"),
+    });
     const app = createArtworkMemoryReportApp({
       root: document.getElementById("artwork-report-root"),
       chapterId,
+      config,
     });
     window.YesterdayArtworkReport = app;
     await document.fonts.ready;
