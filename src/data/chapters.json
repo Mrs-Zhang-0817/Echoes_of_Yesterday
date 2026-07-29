@@ -23,4 +23,9 @@
   "title": "归家迷途",
   "memoryUnlock": 35,
   "order": 5
+}, {
+  "id": "ch06_table",
+  "title": "餐桌上的博弈",
+  "memoryUnlock": 45,
+  "order": 6
 }]

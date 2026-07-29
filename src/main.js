@@ -9,6 +9,7 @@ import { SceneDesk } from './scenes/Scene_Desk.js';
 import { ScenePuzzle } from './scenes/Scene_Puzzle.js';
 import { SceneMaze } from './scenes/Scene_Maze.js';
 import { Chapter05 } from './chapters/ch05_door.js';
+import { Chapter06 } from './chapters/ch06_table.js';
 
 const DESIGN_W = 1280;
 const DESIGN_H = 720;
@@ -134,6 +135,7 @@ async function boot() {
     chapterManager.register('maze', SceneMaze);
     // Ch5 用新规范 Chapter05
     chapterManager.register('ch05_door', Chapter05);
+    chapterManager.register('ch06_table', Chapter06);
 
     // 拼图完成 → Ch3 迷宫
     game.onPuzzleComplete = () => {
