@@ -1,8 +1,0 @@
-{
-  "name": "yesterday-reappears-ch2",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "test": "node --test"
-  }
-}

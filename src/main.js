@@ -101,8 +101,8 @@ async function boot() {
   drawStatus('正在唤醒记忆……', '加载画面 0 / 3');
   try {
     const manifest = {
-      room: './assets/images/room_bg.png',
-      desk: './assets/images/desk_bg.png',
+      room: './assets/images/scene_room.jpg',
+      desk: './assets/images/scene_desk.jpg',
       puzzle: './assets/images/scene_puzzle.jpg',
     };
 
