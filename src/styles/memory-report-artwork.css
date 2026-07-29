@@ -185,39 +185,100 @@ body,
   background: rgba(90, 56, 34, .45);
 }
 
-.artwork-report-button {
+.artwork-report-button-hitbox {
   position: absolute;
   z-index: 5;
-  display: grid;
-  place-items: center;
-  color: #593b24;
-  font-family:
-    "YesterdayChapter", "STKaiti", "KaiTi", "楷体", serif;
-  font-size: clamp(16px, 1.75vw, 29px);
-  letter-spacing: .08em;
-  background:
-    linear-gradient(
-      100deg,
-      rgba(213, 181, 121, .94),
-      rgba(241, 218, 170, .96) 50%,
-      rgba(198, 157, 96, .93)
-    );
+  color: transparent !important;
+  font-size: 0;
+}
+
+.artwork-report-button-hitbox.memory-button-v4--artwork-hitbox {
+  border: 0;
+  outline: 0;
+  background: none;
+  box-shadow: none;
+  clip-path: none;
+  opacity: 1;
+  filter: none;
+  isolation: auto;
+  transform-origin: center;
+}
+
+.artwork-report-button-hitbox.memory-button-v4--artwork-hitbox::before {
+  inset: 2%;
+  border: 0;
+  outline: 0;
+  background: rgba(255, 214, 126, 0);
+  box-shadow: none;
+  opacity: 0;
+  transition:
+    opacity 400ms ease,
+    background-color 400ms ease,
+    box-shadow 400ms ease,
+    backdrop-filter 400ms ease;
+}
+
+.artwork-report-button-hitbox.memory-button-v4--artwork-hitbox::after {
+  content: none;
+}
+
+.artwork-report-button-hitbox.memory-button-v4--artwork-hitbox[
+  data-button-state="hover"
+] {
+  transform: translateY(-2px) scale(1.025);
+  background: none;
+  box-shadow: none;
+  filter: none;
+}
+
+.artwork-report-button-hitbox.memory-button-v4--artwork-hitbox[
+  data-button-state="hover"
+]::before {
+  outline: 0;
+  opacity: 1;
+  background: rgba(255, 215, 132, .055);
   box-shadow:
-    inset 0 0 13px rgba(96, 60, 29, .14),
-    2px 6px 9px rgba(49, 28, 13, .2);
+    inset 0 0 14px rgba(255, 224, 158, .12),
+    0 0 13px rgba(226, 165, 65, .24);
+  backdrop-filter: brightness(1.08) saturate(1.03);
 }
 
-.artwork-report-button.memory-button-v4--artwork {
-  clip-path: polygon(
-    .4% 5%, 8% 1%, 22% 3%, 38% 1%, 55% 3%, 72% 1%,
-    91% 2%, 99.6% 6%, 100% 94%, 91% 99%, 72% 97%, 51% 100%,
-    29% 98%, 9% 100%, .4% 94%
-  );
+.artwork-report-button-hitbox.memory-button-v4--artwork-hitbox[
+  data-button-state="pressed"
+] {
+  transform: translateY(1px) scale(.995);
+  background: none;
+  box-shadow: none;
+  filter: none;
 }
 
-.artwork-memory-report.is-artwork-archived
-  .artwork-report-button:nth-of-type(2) {
-  filter: brightness(1.04) saturate(.9);
+.artwork-report-button-hitbox.memory-button-v4--artwork-hitbox[
+  data-button-state="pressed"
+]::before {
+  opacity: .7;
+  background: rgba(126, 77, 31, .035);
+  box-shadow: inset 0 2px 7px rgba(70, 42, 20, .13);
+  backdrop-filter: brightness(.98);
+}
+
+.artwork-report-button-hitbox.memory-button-v4--artwork-hitbox[
+  data-button-state="disabled"
+] {
+  transform: none;
+  background: none;
+  box-shadow: none;
+  filter: none;
+  opacity: 1;
+}
+
+.artwork-report-button-hitbox.memory-button-v4--artwork-hitbox[
+  data-button-state="completed"
+] {
+  transform: none;
+  background: none;
+  box-shadow: none;
+  filter: none;
+  opacity: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {
