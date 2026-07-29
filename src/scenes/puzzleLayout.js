@@ -2,7 +2,10 @@ export const DEFAULT_PUZZLE_LAYOUT = {
   panel: { x: 370, y: 120, width: 540, height: 405 },
   pieceScale: 0.7,
   safeMargin: 24,
-  snapRadius: 36,
+  snapRadius: 50,
+  mobileInstantSnap: true,
+  touchSnapRadius: 96,
+  sourceCrop: { x: 26, y: 20, width: 1396, height: 1047 },
   slots: [
     { x: 397, y: 10 }, { x: 577, y: 10 }, { x: 757, y: 10 },
     { x: 42, y: 170 }, { x: 42, y: 330 }, { x: 1112, y: 170 },
@@ -13,14 +16,16 @@ export const DEFAULT_PUZZLE_LAYOUT = {
 
 // ---- 切片定义 ----
 // 每个碎片从原图中采样的源矩形（整数像素），避免浮点缝隙
-export function getSourceRects(cellW, cellH) {
-  // cellW, cellH = 原图宽/高除以 3，向下取整，余数给最后一行/列
+export function getSourceRects(imageWidth, imageHeight) {
+  // 前两列/行各取 floor，最后一列/行取得剩余像素，确保完整覆盖原图。
+  const cellW = Math.floor(imageWidth / 3);
+  const cellH = Math.floor(imageHeight / 3);
   const w0 = cellW;
   const w1 = cellW;
-  const w2 = cellW;
+  const w2 = imageWidth - cellW * 2;
   const h0 = cellH;
   const h1 = cellH;
-  const h2 = cellH;
+  const h2 = imageHeight - cellH * 2;
 
   return [
     // row 0
@@ -48,10 +53,13 @@ function shuffle(values, rng) {
 }
 
 export function createPuzzlePieces(imageWidth, imageHeight, rng = Math.random, layout = DEFAULT_PUZZLE_LAYOUT) {
-  // 整数切片 —— imageWidth/imageHeight 不能正好除以 3 时，前两列/行各取 floor，最后一列/行取剩余
-  const baseW = Math.floor(imageWidth / 3);
-  const baseH = Math.floor(imageHeight / 3);
-  const rects = getSourceRects(baseW, baseH);
+  // 裁掉原图自带的黑色哑边，再用整数切片完整覆盖可见画面。
+  const sourceCrop = layout.sourceCrop ?? { x: 0, y: 0, width: imageWidth, height: imageHeight };
+  const rects = getSourceRects(sourceCrop.width, sourceCrop.height).map(rect => ({
+    ...rect,
+    sourceX: rect.sourceX + sourceCrop.x,
+    sourceY: rect.sourceY + sourceCrop.y,
+  }));
 
   const ids = shuffle(Array.from({ length: 9 }, (_, id) => id), rng);
   const cellWidth = layout.panel.width / 3;
@@ -146,4 +154,16 @@ export function snapPieceToTarget(piece, radius) {
   piece.height = piece.targetHeight;
   piece.placed = true;
   return true;
+}
+
+export function pathPassesNearTarget(fromX, fromY, toX, toY, targetX, targetY, radius) {
+  const dx = toX - fromX;
+  const dy = toY - fromY;
+  const lengthSquared = dx * dx + dy * dy;
+  if (lengthSquared === 0) return Math.hypot(fromX - targetX, fromY - targetY) <= radius;
+
+  const progress = Math.max(0, Math.min(1,
+    ((targetX - fromX) * dx + (targetY - fromY) * dy) / lengthSquared,
+  ));
+  return Math.hypot(fromX + dx * progress - targetX, fromY + dy * progress - targetY) <= radius;
 }

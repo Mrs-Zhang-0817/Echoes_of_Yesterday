@@ -28,8 +28,8 @@ function resizeCanvas() {
   offsetY = (h - displayH) / 2;
 
   // Canvas 物理像素
-  canvas.width = displayW * dpr;
-  canvas.height = displayH * dpr;
+  canvas.width = Math.round(DESIGN_W * dpr);
+  canvas.height = Math.round(DESIGN_H * dpr);
 
   // CSS 显示
   canvas.style.width = displayW + 'px';
@@ -103,7 +103,7 @@ async function boot() {
     const manifest = {
       room: './assets/images/room_bg.png',
       desk: './assets/images/desk_bg.png',
-      puzzle: './assets/images/puzzle_img.png',
+      puzzle: './assets/images/scene_puzzle.jpg',
     };
 
     const images = await Loader.loadImages(manifest, (loaded, total) => {

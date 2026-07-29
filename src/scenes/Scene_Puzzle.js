@@ -1,5 +1,5 @@
 import { drawPrompt, roundedRect } from './sceneUtils.js';
-import { DEFAULT_PUZZLE_LAYOUT, createPuzzlePieces, ejectPiecesBlockingTarget, getTopmostPieceAt, snapPieceToTarget } from './puzzleLayout.js';
+import { DEFAULT_PUZZLE_LAYOUT, createPuzzlePieces, ejectPiecesBlockingTarget, getTopmostPieceAt, pathPassesNearTarget, snapPieceToTarget } from './puzzleLayout.js';
 
 export class ScenePuzzle {
   constructor(game) {
@@ -66,10 +66,25 @@ export class ScenePuzzle {
     }
 
     const { safeMargin } = DEFAULT_PUZZLE_LAYOUT;
-    this.draggedPiece.x = Math.max(safeMargin,
-      Math.min(this.game.width - this.draggedPiece.width - safeMargin, point.x - this.offset.x));
-    this.draggedPiece.y = Math.max(safeMargin,
-      Math.min(this.game.height - this.draggedPiece.height - safeMargin, point.y - this.offset.y));
+    const piece = this.draggedPiece;
+    const previousX = piece.x;
+    const previousY = piece.y;
+    piece.x = Math.max(safeMargin,
+      Math.min(this.game.width - piece.width - safeMargin, point.x - this.offset.x));
+    piece.y = Math.max(safeMargin,
+      Math.min(this.game.height - piece.height - safeMargin, point.y - this.offset.y));
+
+    if (DEFAULT_PUZZLE_LAYOUT.mobileInstantSnap && point.pointerType === 'touch' &&
+      pathPassesNearTarget(previousX, previousY, piece.x, piece.y, piece.targetX, piece.targetY, DEFAULT_PUZZLE_LAYOUT.touchSnapRadius)) {
+      piece.x = piece.targetX;
+      piece.y = piece.targetY;
+      piece.width = piece.targetWidth;
+      piece.height = piece.targetHeight;
+      piece.placed = true;
+      piece.dragging = false;
+      this.hasMoved = false;
+      this.finishPlacement(piece);
+    }
   }
 
   handleUp(point) {
@@ -79,9 +94,10 @@ export class ScenePuzzle {
       this.draggedPiece = null;
       this.activePointerId = null;
 
-      if (snapPieceToTarget(piece, DEFAULT_PUZZLE_LAYOUT.snapRadius)) {
+      if (this.hasMoved && snapPieceToTarget(piece, DEFAULT_PUZZLE_LAYOUT.snapRadius)) {
         this.finishPlacement(piece);
       }
+      this.hasMoved = false;
     }
   }
 
@@ -91,6 +107,7 @@ export class ScenePuzzle {
       this.draggedPiece = null;
       this.activePointerId = null;
       this.hoveredPiece = null;
+      this.hasMoved = false;
     }
   }
 
