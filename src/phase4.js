@@ -10,6 +10,18 @@ const stage = document.getElementById("stage");
 const settingsSheet = document.getElementById("settingsSheet");
 const debugToggle = document.getElementById("debugToggle");
 const debugPanel = document.getElementById("debugPanel");
+const useDirectNavigation = stage.dataset.directNavigation === "true";
+const startTarget =
+  stage.dataset.startTarget ?? "./memory-report.html";
+
+function navigate(url) {
+  if (useDirectNavigation) {
+    sessionStorage.removeItem("yesterday:page-transition");
+    window.location.assign(url);
+    return;
+  }
+  transition.navigate(url);
+}
 
 new PaperLayer(settingsSheet, { depth: "sticky", rotation: 1.2, zIndex: 24 });
 
@@ -64,7 +76,7 @@ document.querySelectorAll(".asset-button").forEach((element) => {
         "Activated",
         special ? "MOTION_MEMORY_AWAKEN" : "MOTION_BUTTON_RELEASE",
       );
-      if (special) transition.navigate("./memory-report.html");
+      if (special) navigate(startTarget);
       if (element.id === "BTN_SETTINGS") {
         const open = !settingsSheet.classList.contains("open");
         settingsSheet.classList.toggle("open", open);
@@ -95,7 +107,7 @@ chapterSheet.querySelectorAll(".chapter-card:not(:disabled)").forEach((card) => 
     stateKey: `CHAPTER_${card.dataset.chapter}`,
     onActivate: () => {
       sessionStorage.setItem("yesterday:chapter-selection", card.dataset.chapter);
-      transition.navigate(
+      navigate(
         `./memory-report.html?chapter=${encodeURIComponent(card.dataset.chapter)}`,
       );
     },

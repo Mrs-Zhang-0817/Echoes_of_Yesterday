@@ -204,7 +204,7 @@ export class ArtworkMemoryReportApp {
         }),
       );
     }
-    if (action === "home") window.location.assign("./index.html");
+    if (action === "home") window.location.assign("./main-menu.html");
   }
 
   async start() {
