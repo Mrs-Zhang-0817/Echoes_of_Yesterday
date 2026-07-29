@@ -1,5 +1,4 @@
 import { Button } from "./components/Button.js";
-import { MemoryPageTransition } from "./animations/PageTransition.js";
 import {
   getArtworkMemoryReportConfig,
   getNextArtworkChapter,
@@ -130,7 +129,7 @@ export class ArtworkMemoryReportApp {
   constructor({ root, chapterId }) {
     this.root = root;
     this.config = getArtworkMemoryReportConfig(chapterId);
-    this.transition = new MemoryPageTransition();
+    sessionStorage.removeItem("yesterday:page-transition");
     this.buttons = [];
     this.build();
   }
@@ -192,7 +191,7 @@ export class ArtworkMemoryReportApp {
   handleButton(action) {
     if (action === "continue") {
       const nextChapter = getNextArtworkChapter(this.config.chapterId);
-      this.transition.navigate(
+      window.location.assign(
         `./memory-report-artwork.html?chapter=${nextChapter}`,
       );
     }
@@ -205,7 +204,7 @@ export class ArtworkMemoryReportApp {
         }),
       );
     }
-    if (action === "home") this.transition.navigate("./index.html");
+    if (action === "home") window.location.assign("./index.html");
   }
 
   async start() {
