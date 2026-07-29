@@ -12,10 +12,34 @@ const SHARED_PERCENTAGE_POSITION = Object.freeze({
   rightY: 25,
 });
 
-const SHARED_BUTTONS = Object.freeze([
-  Object.freeze({ x: 23.2, y: 88.1, width: 17.6, height: 8.9 }),
-  Object.freeze({ x: 44.1, y: 88.1, width: 17.8, height: 8.9 }),
-  Object.freeze({ x: 65.0, y: 88.1, width: 17.8, height: 8.9 }),
+const SHARED_BUTTON_AREAS = Object.freeze([
+  Object.freeze({
+    id: "continue",
+    label: "继续昨日",
+    action: "continue",
+    x: 23.2,
+    y: 88.1,
+    width: 17.6,
+    height: 8.9,
+  }),
+  Object.freeze({
+    id: "archive",
+    label: "查看记忆档案",
+    action: "archive",
+    x: 44.1,
+    y: 88.1,
+    width: 17.8,
+    height: 8.9,
+  }),
+  Object.freeze({
+    id: "home",
+    label: "返回主界面",
+    action: "home",
+    x: 65.0,
+    y: 88.1,
+    width: 17.8,
+    height: 8.9,
+  }),
 ]);
 
 export const ARTWORK_MEMORY_REPORT_CONFIG = Object.freeze({
@@ -26,7 +50,7 @@ export const ARTWORK_MEMORY_REPORT_CONFIG = Object.freeze({
     memoryTo: 15,
     progressArea: SHARED_PROGRESS_AREA,
     percentagePosition: SHARED_PERCENTAGE_POSITION,
-    buttons: SHARED_BUTTONS,
+    buttonAreas: SHARED_BUTTON_AREAS,
     coverImageOverlay: null,
   }),
   chapter_03: Object.freeze({
@@ -36,7 +60,7 @@ export const ARTWORK_MEMORY_REPORT_CONFIG = Object.freeze({
     memoryTo: 15,
     progressArea: SHARED_PROGRESS_AREA,
     percentagePosition: SHARED_PERCENTAGE_POSITION,
-    buttons: SHARED_BUTTONS,
+    buttonAreas: SHARED_BUTTON_AREAS,
     coverImageOverlay: null,
   }),
   chapter_05: Object.freeze({
@@ -46,7 +70,7 @@ export const ARTWORK_MEMORY_REPORT_CONFIG = Object.freeze({
     memoryTo: 35,
     progressArea: SHARED_PROGRESS_AREA,
     percentagePosition: SHARED_PERCENTAGE_POSITION,
-    buttons: SHARED_BUTTONS,
+    buttonAreas: SHARED_BUTTON_AREAS,
     coverImageOverlay: null,
   }),
 });

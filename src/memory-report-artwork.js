@@ -6,12 +6,6 @@ import {
 } from "./memory-report-artwork-config.js";
 
 const PROGRESS_DURATION = 1800;
-const BUTTON_LABELS = Object.freeze([
-  "继续昨日",
-  "查看记忆档案",
-  "返回主界面",
-]);
-
 function applyRect(element, rect) {
   element.style.left = `${rect.x}%`;
   element.style.top = `${rect.y}%`;
@@ -160,33 +154,33 @@ export class ArtworkMemoryReportApp {
   }
 
   buildButtons() {
-    this.config.buttons.forEach((rect, index) => {
+    this.config.buttonAreas.forEach((area) => {
       const element = document.createElement("div");
-      element.id = `artwork-report-button-${index + 1}`;
-      element.className = "artwork-report-button";
+      element.id = `artwork-report-hitbox-${area.id}`;
+      element.className = "artwork-report-button-hitbox";
       element.setAttribute("role", "button");
-      applyRect(element, rect);
+      element.setAttribute("aria-label", area.label);
+      applyRect(element, area);
       this.stage.appendChild(element);
 
       const button = new Button(element, {
-        type: "artwork",
-        special: index === 0,
+        type: "artwork-hitbox",
+        special: area.action === "continue",
         stateKey: element.id,
-        label: BUTTON_LABELS[index],
-        onActivate: () => this.handleButton(index),
+        onActivate: () => this.handleButton(area.action),
       });
       this.buttons.push(button);
     });
   }
 
-  handleButton(index) {
-    if (index === 0) {
+  handleButton(action) {
+    if (action === "continue") {
       const nextChapter = getNextArtworkChapter(this.config.chapterId);
       this.transition.navigate(
         `./memory-report-artwork.html?chapter=${nextChapter}`,
       );
     }
-    if (index === 1) {
+    if (action === "archive") {
       this.stage.classList.add("is-artwork-archived");
       this.stage.dispatchEvent(
         new CustomEvent("artwork-memory-report:archive", {
@@ -195,7 +189,7 @@ export class ArtworkMemoryReportApp {
         }),
       );
     }
-    if (index === 2) this.transition.navigate("./index.html");
+    if (action === "home") this.transition.navigate("./index.html");
   }
 
   async start() {
