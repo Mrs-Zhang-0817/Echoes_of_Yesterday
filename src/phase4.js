@@ -10,6 +10,10 @@ const stage = document.getElementById("stage");
 const settingsSheet = document.getElementById("settingsSheet");
 const debugToggle = document.getElementById("debugToggle");
 const debugPanel = document.getElementById("debugPanel");
+const debugUIEnabled =
+  new URLSearchParams(window.location.search).get("debugUI") === "true";
+debugToggle.hidden = !debugUIEnabled;
+debugPanel.hidden = !debugUIEnabled;
 const useDirectNavigation = stage.dataset.directNavigation === "true";
 const startTarget =
   stage.dataset.startTarget ?? "./memory-report.html";

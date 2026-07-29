@@ -2,9 +2,15 @@
   "schemaVersion": "1.0",
   "defaultChapter": "chapter_02",
   "chapterOrder": [
+    "chapter_01",
     "chapter_02",
     "chapter_03",
-    "chapter_05"
+    "chapter_04",
+    "chapter_05",
+    "chapter_06",
+    "chapter_07",
+    "chapter_08",
+    "chapter_09"
   ],
   "progressArea": {
     "x": 14.8,
@@ -69,6 +75,12 @@
     }
   ],
   "chapters": {
+    "chapter_01": {
+      "backgroundImage": "./记忆恢复报告新底图/第一章.png",
+      "memoryFrom": 0,
+      "memoryTo": 5,
+      "coverImageOverlay": null
+    },
     "chapter_02": {
       "backgroundImage": "./记忆恢复报告新底图/第二章.png",
       "memoryFrom": 5,
@@ -81,10 +93,40 @@
       "memoryTo": 15,
       "coverImageOverlay": null
     },
+    "chapter_04": {
+      "backgroundImage": "./记忆恢复报告新底图/第四章 (2).png",
+      "memoryFrom": 15,
+      "memoryTo": 25,
+      "coverImageOverlay": null
+    },
     "chapter_05": {
       "backgroundImage": "./记忆恢复报告新底图/第五章.png",
       "memoryFrom": 25,
       "memoryTo": 35,
+      "coverImageOverlay": null
+    },
+    "chapter_06": {
+      "backgroundImage": "./记忆恢复报告新底图/第六章.png",
+      "memoryFrom": 35,
+      "memoryTo": 45,
+      "coverImageOverlay": null
+    },
+    "chapter_07": {
+      "backgroundImage": "./记忆恢复报告新底图/第七章 (2).png",
+      "memoryFrom": 45,
+      "memoryTo": 55,
+      "coverImageOverlay": null
+    },
+    "chapter_08": {
+      "backgroundImage": "./记忆恢复报告新底图/第八章.png",
+      "memoryFrom": 55,
+      "memoryTo": 65,
+      "coverImageOverlay": null
+    },
+    "chapter_09": {
+      "backgroundImage": "./记忆恢复报告新底图/第九章.png",
+      "memoryFrom": 65,
+      "memoryTo": 75,
       "coverImageOverlay": null
     }
   }
