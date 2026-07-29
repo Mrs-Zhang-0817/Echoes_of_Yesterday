@@ -207,16 +207,6 @@ body,
   position: absolute;
   display: block;
   max-width: none;
-  clip-path: polygon(
-    2% 6%,
-    8% 2%,
-    92% 1%,
-    98% 6%,
-    100% 89%,
-    96% 97%,
-    6% 99%,
-    1% 92%
-  );
   user-select: none;
   pointer-events: none;
   -webkit-user-drag: none;
@@ -225,6 +215,18 @@ body,
     transform 400ms cubic-bezier(.22, .7, .25, 1),
     filter 400ms ease-out,
     opacity 400ms ease-out;
+}
+
+/*
+ * These paper buttons belong to the report artwork. The progress sequence
+ * may lock interaction, but it must not turn that lock into an entrance fade.
+ */
+.artwork-memory-report:not([data-render-state="complete"])
+  .artwork-report-image-button__image {
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+  transition: none !important;
 }
 
 .artwork-report-image-button.memory-button-v4--artwork-image::before,
@@ -244,7 +246,7 @@ body,
 .artwork-report-image-button.memory-button-v4--artwork-image[
   data-button-state="hover"
 ] .artwork-report-image-button__image {
-  transform: translateY(-2px) scale(1.04);
+  transform: translateY(-2px) scale(1.03);
   filter:
     sepia(.08)
     brightness(1.08)
@@ -264,7 +266,7 @@ body,
 .artwork-report-image-button.memory-button-v4--artwork-image[
   data-button-state="pressed"
 ] .artwork-report-image-button__image {
-  transform: translateY(1px) scale(.985);
+  transform: scale(.98);
   filter:
     sepia(.1)
     brightness(.97)
@@ -298,17 +300,6 @@ body,
   box-shadow: none;
   filter: none;
   opacity: 1;
-}
-
-.artwork-report-image-button.memory-button-v4--awakening[
-  data-button-state="hover"
-] .artwork-report-image-button__image {
-  transform: translateY(-4px) scale(1.04);
-  filter:
-    brightness(1.14)
-    saturate(1.1)
-    drop-shadow(0 0 9px rgba(255, 196, 72, .46))
-    drop-shadow(0 8px 7px rgba(47, 26, 12, .3));
 }
 
 @media (prefers-reduced-motion: reduce) {
