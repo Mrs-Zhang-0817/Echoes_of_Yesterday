@@ -185,14 +185,13 @@ body,
   background: rgba(90, 56, 34, .45);
 }
 
-.artwork-report-button-hitbox {
+.artwork-report-image-button {
   position: absolute;
   z-index: 5;
-  color: transparent !important;
-  font-size: 0;
+  overflow: visible;
 }
 
-.artwork-report-button-hitbox.memory-button-v4--artwork-hitbox {
+.artwork-report-image-button.memory-button-v4--artwork-image {
   border: 0;
   outline: 0;
   background: none;
@@ -204,64 +203,77 @@ body,
   transform-origin: center;
 }
 
-.artwork-report-button-hitbox.memory-button-v4--artwork-hitbox::before {
-  inset: 2%;
-  border: 0;
-  outline: 0;
-  background: rgba(255, 214, 126, 0);
-  box-shadow: none;
-  opacity: 0;
+.artwork-report-image-button__image {
+  position: absolute;
+  display: block;
+  max-width: none;
+  clip-path: polygon(
+    2% 6%,
+    8% 2%,
+    92% 1%,
+    98% 6%,
+    100% 89%,
+    96% 97%,
+    6% 99%,
+    1% 92%
+  );
+  user-select: none;
+  pointer-events: none;
+  -webkit-user-drag: none;
+  transform-origin: center;
   transition:
-    opacity 400ms ease,
-    background-color 400ms ease,
-    box-shadow 400ms ease,
-    backdrop-filter 400ms ease;
+    transform 400ms cubic-bezier(.22, .7, .25, 1),
+    filter 400ms ease-out,
+    opacity 400ms ease-out;
 }
 
-.artwork-report-button-hitbox.memory-button-v4--artwork-hitbox::after {
+.artwork-report-image-button.memory-button-v4--artwork-image::before,
+.artwork-report-image-button.memory-button-v4--artwork-image::after {
   content: none;
 }
 
-.artwork-report-button-hitbox.memory-button-v4--artwork-hitbox[
+.artwork-report-image-button.memory-button-v4--artwork-image[
   data-button-state="hover"
 ] {
-  transform: translateY(-2px) scale(1.025);
+  transform: none;
   background: none;
   box-shadow: none;
   filter: none;
 }
 
-.artwork-report-button-hitbox.memory-button-v4--artwork-hitbox[
+.artwork-report-image-button.memory-button-v4--artwork-image[
   data-button-state="hover"
-]::before {
-  outline: 0;
-  opacity: 1;
-  background: rgba(255, 215, 132, .055);
-  box-shadow:
-    inset 0 0 14px rgba(255, 224, 158, .12),
-    0 0 13px rgba(226, 165, 65, .24);
-  backdrop-filter: brightness(1.08) saturate(1.03);
+] .artwork-report-image-button__image {
+  transform: translateY(-2px) scale(1.04);
+  filter:
+    sepia(.08)
+    brightness(1.08)
+    saturate(1.03)
+    drop-shadow(0 6px 5px rgba(47, 26, 12, .24));
 }
 
-.artwork-report-button-hitbox.memory-button-v4--artwork-hitbox[
+.artwork-report-image-button.memory-button-v4--artwork-image[
   data-button-state="pressed"
 ] {
-  transform: translateY(1px) scale(.995);
+  transform: none;
   background: none;
   box-shadow: none;
   filter: none;
 }
 
-.artwork-report-button-hitbox.memory-button-v4--artwork-hitbox[
+.artwork-report-image-button.memory-button-v4--artwork-image[
   data-button-state="pressed"
-]::before {
-  opacity: .7;
-  background: rgba(126, 77, 31, .035);
-  box-shadow: inset 0 2px 7px rgba(70, 42, 20, .13);
-  backdrop-filter: brightness(.98);
+] .artwork-report-image-button__image {
+  transform: translateY(1px) scale(.985);
+  filter:
+    sepia(.1)
+    brightness(.97)
+    saturate(.94)
+    drop-shadow(0 2px 2px rgba(47, 26, 12, .18));
+  transition-duration: 130ms;
 }
 
-.artwork-report-button-hitbox.memory-button-v4--artwork-hitbox[
+.artwork-report-image-button.memory-button-v4--artwork-image[
   data-button-state="disabled"
 ] {
   transform: none;
@@ -271,7 +283,14 @@ body,
   opacity: 1;
 }
 
-.artwork-report-button-hitbox.memory-button-v4--artwork-hitbox[
+.artwork-report-image-button.memory-button-v4--artwork-image[
+  data-button-state="disabled"
+] .artwork-report-image-button__image {
+  opacity: .55;
+  filter: grayscale(.45) sepia(.12) saturate(.55) brightness(.82);
+}
+
+.artwork-report-image-button.memory-button-v4--artwork-image[
   data-button-state="completed"
 ] {
   transform: none;
@@ -279,6 +298,17 @@ body,
   box-shadow: none;
   filter: none;
   opacity: 1;
+}
+
+.artwork-report-image-button.memory-button-v4--awakening[
+  data-button-state="hover"
+] .artwork-report-image-button__image {
+  transform: translateY(-4px) scale(1.04);
+  filter:
+    brightness(1.14)
+    saturate(1.1)
+    drop-shadow(0 0 9px rgba(255, 196, 72, .46))
+    drop-shadow(0 8px 7px rgba(47, 26, 12, .3));
 }
 
 @media (prefers-reduced-motion: reduce) {
