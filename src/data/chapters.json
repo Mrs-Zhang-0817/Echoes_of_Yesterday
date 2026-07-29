@@ -1,0 +1,26 @@
+[{
+  "id": "ch01_intro",
+  "title": "儿时的回忆",
+  "memoryUnlock": 5,
+  "order": 1
+}, {
+  "id": "ch02_puzzle",
+  "title": "接女儿放学",
+  "memoryUnlock": 15,
+  "order": 2
+}, {
+  "id": "ch03_maze",
+  "title": "迷途",
+  "memoryUnlock": 15,
+  "order": 3
+}, {
+  "id": "ch04_police",
+  "title": "警局",
+  "memoryUnlock": 25,
+  "order": 4
+}, {
+  "id": "ch05_door",
+  "title": "归家迷途",
+  "memoryUnlock": 35,
+  "order": 5
+}]

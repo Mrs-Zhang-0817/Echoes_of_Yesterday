@@ -1,12 +1,14 @@
 import { Game } from './core/Game.js';
 import { InputManager } from './core/InputManager.js';
 import { Loader } from './core/Loader.js';
-import { SceneManager } from './core/SceneManager.js';
+import { ChapterManager } from './core/ChapterManager.js';
+import { ProgressStore } from './core/ProgressStore.js';
+import { Overlay } from './core/Overlay.js';
 import { SceneRoom } from './scenes/Scene_Room.js';
 import { SceneDesk } from './scenes/Scene_Desk.js';
 import { ScenePuzzle } from './scenes/Scene_Puzzle.js';
 import { SceneMaze } from './scenes/Scene_Maze.js';
-import { SceneReturnNight } from './scenes/Scene_ReturnNight.js';
+import { Chapter05 } from './chapters/ch05_door.js';
 
 const DESIGN_W = 1280;
 const DESIGN_H = 720;
@@ -22,24 +24,20 @@ function resizeCanvas() {
   const dpr = window.devicePixelRatio || 1;
   const { innerWidth: w, innerHeight: h } = window;
 
-  // 等比缩放：保持 16:9 比例，最大化填满屏幕
   scale = Math.min(w / DESIGN_W, h / DESIGN_H);
   const displayW = DESIGN_W * scale;
   const displayH = DESIGN_H * scale;
   offsetX = (w - displayW) / 2;
   offsetY = (h - displayH) / 2;
 
-  // Canvas 物理像素
   canvas.width = Math.round(DESIGN_W * dpr);
   canvas.height = Math.round(DESIGN_H * dpr);
 
-  // CSS 显示
   canvas.style.width = displayW + 'px';
   canvas.style.height = displayH + 'px';
   canvas.style.left = offsetX + 'px';
   canvas.style.top = offsetY + 'px';
 
-  // 重置变换：先 scale(dpr) 让 1 逻辑像素 = 1 CSS 像素，再无缩放渲染
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 
@@ -100,7 +98,7 @@ function drawStatus(message, detail = '') {
 }
 
 async function boot() {
-  drawStatus('正在唤醒记忆……', '加载画面 0 / 3');
+  drawStatus('正在唤醒记忆……', '加载画面');
   try {
     const manifest = {
       room: './assets/images/scene_room.jpg',
@@ -114,46 +112,54 @@ async function boot() {
       drawStatus('正在唤醒记忆……', `加载画面 ${loaded} / ${total}`);
     });
 
-    const game = { canvas, ctx, width: DESIGN_W, height: DESIGN_H, images };
-    game.input = new InputManager(canvas, DESIGN_W, DESIGN_H);
-    game.sceneManager = new SceneManager(game);
-    game.sceneManager.register('room', SceneRoom);
-    game.sceneManager.register('desk', SceneDesk);
-    game.sceneManager.register('puzzle', ScenePuzzle);
-    game.sceneManager.register('maze', SceneMaze);
-    game.sceneManager.register('returnNight', SceneReturnNight);
+    const input = new InputManager(canvas, DESIGN_W, DESIGN_H);
+    const progress = new ProgressStore();
+    const overlay = new Overlay({ canvas, ctx, width: DESIGN_W, height: DESIGN_H, input });
 
-    // 拼图完成 → 进入 Ch3 迷宫连线（按需加载地图图片）
+    const game = {
+      canvas, ctx, width: DESIGN_W, height: DESIGN_H, images,
+      input, progress, overlay,
+      chapterManager: null,
+    };
+
+    const chapterManager = new ChapterManager(game);
+    game.chapterManager = chapterManager;
+    game.sceneManager = chapterManager;    // 兼容旧 Scene_* 的 this.game.sceneManager.switchTo
+    game.overlay = overlay;
+
+    // 注册旧场景（用 Ch2/Ch3 临时过渡）
+    chapterManager.register('room', SceneRoom);
+    chapterManager.register('desk', SceneDesk);
+    chapterManager.register('puzzle', ScenePuzzle);
+    chapterManager.register('maze', SceneMaze);
+    // Ch5 用新规范 Chapter05
+    chapterManager.register('ch05_door', Chapter05);
+
+    // 拼图完成 → Ch3 迷宫
     game.onPuzzleComplete = () => {
       console.info('Ch2 拼图完成 ✓');
       const img = new Image();
       img.src = './assets/images/scene_maze_map.png';
       img.onload = () => {
         game.images.mazeMap = img;
-        game.sceneManager.switchTo('maze');
+        chapterManager.switchTo('maze');
       };
       img.onerror = () => {
         console.warn('地图图片加载失败，使用纯色背景');
-        game.sceneManager.switchTo('maze');
+        chapterManager.switchTo('maze');
       };
     };
 
     // Ch3 迷宫完成 → Ch5 归家迷途
     game.onMazeComplete = () => {
-      console.info('Ch3 迷途完成 ✓ → 进入 Ch5 归家迷途');
-      game.sceneManager.switchTo('returnNight');
-    };
-
-    // Ch5 归家迷途完成回调
-    game.onReturnNightComplete = () => {
-      console.info('Ch5 归家迷途完成 ✓');
+      console.info('Ch3 迷途完成 ✓ → Ch5 归家迷途');
+      chapterManager.switchTo('ch05_door');
     };
 
     window.game = game;
-    game.sceneManager.switchTo('room');
+    chapterManager.switchTo('room');
     new Game(game).start();
 
-    // 隐藏 loading
     const loadingEl = document.getElementById('loading');
     if (loadingEl) {
       loadingEl.classList.add('hidden');
