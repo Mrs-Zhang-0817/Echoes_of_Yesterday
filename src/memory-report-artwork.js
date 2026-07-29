@@ -13,6 +13,13 @@ function applyRect(element, rect) {
   element.style.height = `${rect.height}%`;
 }
 
+function applyImageCrop(image, crop) {
+  image.style.left = `${-crop.x / crop.width * 100}%`;
+  image.style.top = `${-crop.y / crop.height * 100}%`;
+  image.style.width = `${10000 / crop.width}%`;
+  image.style.height = `${10000 / crop.height}%`;
+}
+
 function createProgressScale() {
   const scale = document.createElement("div");
   scale.className = "artwork-progress__scale";
@@ -156,15 +163,24 @@ export class ArtworkMemoryReportApp {
   buildButtons() {
     this.config.buttonAreas.forEach((area) => {
       const element = document.createElement("div");
-      element.id = `artwork-report-hitbox-${area.id}`;
-      element.className = "artwork-report-button-hitbox";
+      element.id = `artwork-report-button-${area.id}`;
+      element.className = "artwork-report-image-button";
       element.setAttribute("role", "button");
       element.setAttribute("aria-label", area.label);
       applyRect(element, area);
+
+      const image = document.createElement("img");
+      image.className = "artwork-report-image-button__image";
+      image.src = area.image;
+      image.alt = "";
+      image.draggable = false;
+      image.setAttribute("aria-hidden", "true");
+      applyImageCrop(image, area.crop);
+      element.appendChild(image);
       this.stage.appendChild(element);
 
       const button = new Button(element, {
-        type: "artwork-hitbox",
+        type: "artwork-image",
         special: area.action === "continue",
         stateKey: element.id,
         onActivate: () => this.handleButton(area.action),
