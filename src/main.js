@@ -6,6 +6,7 @@ import { SceneRoom } from './scenes/Scene_Room.js';
 import { SceneDesk } from './scenes/Scene_Desk.js';
 import { ScenePuzzle } from './scenes/Scene_Puzzle.js';
 import { SceneMaze } from './scenes/Scene_Maze.js';
+import { SceneReturnNight } from './scenes/Scene_ReturnNight.js';
 
 const DESIGN_W = 1280;
 const DESIGN_H = 720;
@@ -120,6 +121,7 @@ async function boot() {
     game.sceneManager.register('desk', SceneDesk);
     game.sceneManager.register('puzzle', ScenePuzzle);
     game.sceneManager.register('maze', SceneMaze);
+    game.sceneManager.register('returnNight', SceneReturnNight);
 
     // 拼图完成 → 进入 Ch3 迷宫连线（按需加载地图图片）
     game.onPuzzleComplete = () => {
@@ -136,9 +138,15 @@ async function boot() {
       };
     };
 
-    // Ch3 迷宫完成回调
+    // Ch3 迷宫完成 → Ch5 归家迷途
     game.onMazeComplete = () => {
-      console.info('Ch3 迷途完成 ✓');
+      console.info('Ch3 迷途完成 ✓ → 进入 Ch5 归家迷途');
+      game.sceneManager.switchTo('returnNight');
+    };
+
+    // Ch5 归家迷途完成回调
+    game.onReturnNightComplete = () => {
+      console.info('Ch5 归家迷途完成 ✓');
     };
 
     window.game = game;
