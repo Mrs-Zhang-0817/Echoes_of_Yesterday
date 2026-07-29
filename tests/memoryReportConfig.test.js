@@ -19,9 +19,10 @@ const expectedProgress = {
   chapter_07: [45, 55],
   chapter_08: [55, 65],
   chapter_09: [65, 75],
+  chapter_10: [75, 100],
 };
 
-test("Chapter 01-09 use the approved memory unlock sequence", () => {
+test("Chapter 01-10 use the approved memory unlock sequence", () => {
   assert.deepEqual(config.chapterOrder, Object.keys(expectedProgress));
   for (const [chapterId, [memoryFrom, memoryTo]] of Object.entries(
     expectedProgress,
@@ -38,6 +39,6 @@ test("every configured chapter artwork exists", () => {
   }
 });
 
-test("Chapter 10 remains unconfigured", () => {
-  assert.equal(config.chapters.chapter_10, undefined);
+test("the shared progress overlay is lowered below report copy", () => {
+  assert.equal(config.progressArea.y, 64);
 });

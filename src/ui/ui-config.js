@@ -1,4 +1,4 @@
-export const UI_BASELINE_VERSION = "1.0";
+export const UI_BASELINE_VERSION = "1.1";
 
 export const UI_PATHS = Object.freeze({
   mainMenu: "./main-menu.html",

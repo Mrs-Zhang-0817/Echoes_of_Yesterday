@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.0",
+  "schemaVersion": "1.1",
   "defaultChapter": "chapter_02",
   "chapterOrder": [
     "chapter_01",
@@ -10,11 +10,12 @@
     "chapter_06",
     "chapter_07",
     "chapter_08",
-    "chapter_09"
+    "chapter_09",
+    "chapter_10"
   ],
   "progressArea": {
     "x": 14.8,
-    "y": 59.1,
+    "y": 64,
     "width": 26.4,
     "height": 20.2
   },
@@ -127,6 +128,12 @@
       "backgroundImage": "./记忆恢复报告新底图/第九章.png",
       "memoryFrom": 65,
       "memoryTo": 75,
+      "coverImageOverlay": null
+    },
+    "chapter_10": {
+      "backgroundImage": "./记忆恢复报告新底图/第十章.png",
+      "memoryFrom": 75,
+      "memoryTo": 100,
       "coverImageOverlay": null
     }
   }

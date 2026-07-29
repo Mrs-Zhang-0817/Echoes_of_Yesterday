@@ -1,5 +1,12 @@
 # UI Changelog
 
+## UI v1.1 — Chapter 10 and progress alignment
+
+- 记忆清晰度覆盖区域整体下移，避免与章节底图中的说明文字重叠。
+- 接入第十章 Artwork 底图。
+- 第十章记忆清晰度配置为 75% → 100%。
+- 保持图片按钮、页面比例、字体和既有交互效果不变。
+
 ## UI v1.0 — Production Baseline
 
 - 冻结 `main-menu.html` 主界面。
