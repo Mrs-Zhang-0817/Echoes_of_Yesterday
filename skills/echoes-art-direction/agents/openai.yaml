@@ -1,0 +1,4 @@
+interface:
+  display_name: "昨日重现美术方向"
+  short_description: "Ten-chapter narrative art prompts and game-edge QA"
+  default_prompt: "Use $echoes-art-direction to prepare the next Echoes of Yesterday chapter assets."
