@@ -43,12 +43,13 @@ export class InputManager {
       x: (event.clientX - rect.left) * scaleX,
       y: (event.clientY - rect.top) * scaleY,
       pointerId: event.pointerId,
+      pointerType: event.pointerType,
     };
 
     if (type === 'down') {
       try { this.canvas.setPointerCapture(event.pointerId); } catch {}
     }
-    if (type === 'up') {
+    if (type === 'up' || type === 'cancel') {
       try {
         if (this.canvas.hasPointerCapture?.(event.pointerId))
           this.canvas.releasePointerCapture(event.pointerId);
