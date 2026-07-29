@@ -5,6 +5,7 @@ import { SceneManager } from './core/SceneManager.js';
 import { SceneRoom } from './scenes/Scene_Room.js';
 import { SceneDesk } from './scenes/Scene_Desk.js';
 import { ScenePuzzle } from './scenes/Scene_Puzzle.js';
+import { SceneMaze } from './scenes/Scene_Maze.js';
 
 const DESIGN_W = 1280;
 const DESIGN_H = 720;
@@ -101,8 +102,8 @@ async function boot() {
   drawStatus('正在唤醒记忆……', '加载画面 0 / 3');
   try {
     const manifest = {
-      room: './assets/images/room_bg.png',
-      desk: './assets/images/desk_bg.png',
+      room: './assets/images/scene_room.jpg',
+      desk: './assets/images/scene_desk.jpg',
       puzzle: './assets/images/scene_puzzle.jpg',
     };
 
@@ -118,10 +119,26 @@ async function boot() {
     game.sceneManager.register('room', SceneRoom);
     game.sceneManager.register('desk', SceneDesk);
     game.sceneManager.register('puzzle', ScenePuzzle);
+    game.sceneManager.register('maze', SceneMaze);
 
-    // 拼图完成回调
+    // 拼图完成 → 进入 Ch3 迷宫连线（按需加载地图图片）
     game.onPuzzleComplete = () => {
       console.info('Ch2 拼图完成 ✓');
+      const img = new Image();
+      img.src = './assets/images/scene_maze_map.png';
+      img.onload = () => {
+        game.images.mazeMap = img;
+        game.sceneManager.switchTo('maze');
+      };
+      img.onerror = () => {
+        console.warn('地图图片加载失败，使用纯色背景');
+        game.sceneManager.switchTo('maze');
+      };
+    };
+
+    // Ch3 迷宫完成回调
+    game.onMazeComplete = () => {
+      console.info('Ch3 迷途完成 ✓');
     };
 
     window.game = game;

@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ch3 迷宫连线 — 坐标标注工具</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #1a1a1a; color: #e0e0e0; font-family: system-ui, "PingFang SC", sans-serif; display: flex; height: 100vh; }
+
+  #main {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    overflow: hidden; background: #111; min-height: 0;
+  }
+
+  .canvas-wrap {
+    position: relative; display: flex; align-items: center; justify-content: center;
+    width: 100%; height: 100%;
+    background: #333;
+  }
+  .canvas-wrap canvas { display: block; cursor: crosshair; }
+
+  #sidebar {
+    width: 320px; min-width: 320px; padding: 16px; overflow-y: auto;
+    background: #242424; border-left: 1px solid #3a3a3a;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  #sidebar h2 { font-size: 18px; color: #f0c674; margin-bottom: 4px; }
+  #sidebar h3 { font-size: 14px; color: #aaa; margin-top: 8px; }
+
+  .mode-group { display: flex; gap: 8px; flex-wrap: wrap; }
+  .mode-group button {
+    flex: 1; padding: 8px 12px; border: 2px solid #444; border-radius: 6px;
+    background: #333; color: #ccc; cursor: pointer; font-size: 13px; transition: all 0.15s;
+  }
+  .mode-group button.active { border-color: #f0c674; background: #3a3220; color: #f0c674; }
+  .mode-group button:hover { border-color: #888; }
+  .mode-group button.active:hover { border-color: #f0c674; }
+
+  .node-list { display: flex; flex-direction: column; gap: 4px; max-height: 300px; overflow-y: auto; }
+  .node-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 4px 8px; background: #2a2a2a; border-radius: 4px; font-size: 13px;
+  }
+  .node-item .type-badge {
+    font-size: 11px; padding: 1px 6px; border-radius: 3px; font-weight: 600;
+  }
+  .node-item .coords { color: #888; font-family: monospace; font-size: 12px; margin-left: auto; }
+  .node-item .del-btn { background: none; border: none; color: #e55; cursor: pointer; padding: 2px 4px; font-size: 16px; }
+
+  .edge-list { display: flex; flex-direction: column; gap: 4px; max-height: 200px; overflow-y: auto; }
+  .edge-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 4px 8px; background: #2a2a2a; border-radius: 4px; font-size: 13px;
+  }
+  .edge-item .path-badge { font-size: 11px; padding: 1px 6px; border-radius: 3px; font-weight: 600; }
+  .edge-item .del-btn { background: none; border: none; color: #e55; cursor: pointer; padding: 2px 4px; font-size: 16px; }
+
+  .output-box {
+    background: #1a1a1a; border: 1px solid #3a3a3a; border-radius: 6px;
+    padding: 12px; font-family: monospace; font-size: 12px; white-space: pre-wrap;
+    max-height: 300px; overflow: auto;
+  }
+  .btn-copy {
+    padding: 6px 12px; background: #f0c674; color: #1a1a1a; border: none;
+    border-radius: 4px; cursor: pointer; font-weight: 600; margin-top: 4px;
+  }
+  .btn-copy:hover { background: #e0b864; }
+
+  .help { font-size: 12px; color: #888; line-height: 1.6; }
+  .help kbd { background: #333; padding: 1px 5px; border-radius: 3px; border: 1px solid #555; font-size: 11px; }
+
+  .status-bar {
+    display: flex; align-items: center; gap: 8px; padding: 6px 10px;
+    background: #2a2a2a; border-radius: 6px; font-size: 13px;
+  }
+  .status-bar .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .dot.correct { background: #4caf50; }
+  .dot.deadend { background: #f44336; }
+  .dot.path { background: #2196f3; }
+</style>
+</head>
+<body>
+<div id="main">
+  <div class="canvas-wrap">
+    <canvas id="mapCanvas"></canvas>
+  </div>
+</div>
+<div id="sidebar">
+  <h2>🧭 坐标标注</h2>
+
+  <div class="status-bar">
+    <span id="statusText">点击地图添加节点</span>
+  </div>
+
+  <h3>标注模式</h3>
+  <div class="mode-group">
+    <button data-mode="correct" class="active">✅ 正确节点</button>
+    <button data-mode="deadend">❌ 死胡同</button>
+    <button data-mode="edge">🔗 画路径</button>
+  </div>
+  <div class="help" id="modeHelp">
+    <kbd>左键</kbd> 添加节点 / 连接两个节点 · <kbd>右键</kbd> 删除节点/路径
+  </div>
+
+  <h3>正确路径节点（按顺序）</h3>
+  <div class="node-list" id="correctNodes">
+    <div style="color:#666; font-size:12px;">暂无节点，点击地图添加</div>
+  </div>
+
+  <h3>死胡同节点</h3>
+  <div class="node-list" id="deadendNodes">
+    <div style="color:#666; font-size:12px;">暂无节点</div>
+  </div>
+
+  <h3>路径</h3>
+  <div class="edge-list" id="edgeList">
+    <div style="color:#666; font-size:12px;">切换到"画路径"模式，依次点击两个节点</div>
+  </div>
+
+  <h3>导出数据</h3>
+  <div class="output-box" id="outputBox">// 添加节点后会生成配置数据</div>
+  <button class="btn-copy" id="copyBtn">📋 复制到剪贴板</button>
+</div>
+
+<script>
+const canvas = document.getElementById('mapCanvas');
+const ctx = canvas.getContext('2d');
+
+// ====== 数据 ======
+const img = new Image();
+img.src = './美术素材/第三关/地图.png';
+// 设计分辨率适配
+const DESIGN_W = 1280, DESIGN_H = 720;
+
+let nodes = [];         // {id, x, y, type: 'correct'|'deadend'}
+let edges = [];         // {fromId, toId, isCorrect: true|false}
+let pendingEdgeStart = null; // 画路径时选中的第一个节点ID
+
+let currentMode = 'correct';
+
+let imgNaturalW = 1, imgNaturalH = 1;
+let offsetX = 0, offsetY = 0, scale = 1;
+
+// ====== 坐标转换 ======
+function getLogicalPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  const mx = (e.clientX - rect.left) / scale;
+  const my = (e.clientY - rect.top) / scale;
+  return { x: Math.round(mx), y: Math.round(my) };
+}
+
+// ====== 渲染 ======
+function render() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+  // 绘制边缘（路径）
+  for (const edge of edges) {
+    const from = nodes.find(n => n.id === edge.fromId);
+    const to = nodes.find(n => n.id === edge.toId);
+    if (!from || !to) continue;
+    ctx.beginPath();
+    ctx.moveTo(from.x, from.y);
+    ctx.lineTo(to.x, to.y);
+    ctx.strokeStyle = edge.isCorrect ? 'rgba(76, 175, 80, 0.7)' : 'rgba(244, 67, 54, 0.6)';
+    ctx.lineWidth = edge.isCorrect ? 4 : 3;
+    ctx.setLineDash(edge.isCorrect ? [] : [8, 6]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // 画路径时的预览线
+  if (pendingEdgeStart && currentMode === 'edge') {
+    const from = nodes.find(n => n.id === pendingEdgeStart);
+    if (from) {
+      ctx.beginPath();
+      ctx.moveTo(from.x, from.y);
+      ctx.lineTo(ctx.mouseX || from.x + 50, ctx.mouseY || from.y);
+      ctx.strokeStyle = 'rgba(33, 150, 243, 0.4)';
+      ctx.lineWidth = 3;
+      ctx.setLineDash([6, 4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+
+  // 绘制节点
+  for (const node of nodes) {
+    const r = 18;
+    const isStart = node.id === 'start';
+    const isEnd = node.id === 'end';
+
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, r, 0, Math.PI * 2);
+
+    if (isStart) {
+      ctx.fillStyle = 'rgba(76, 175, 80, 0.85)';
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 3;
+    } else if (isEnd) {
+      ctx.fillStyle = 'rgba(244, 67, 54, 0.85)';
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 3;
+    } else if (node.type === 'deadend') {
+      ctx.fillStyle = 'rgba(244, 67, 54, 0.5)';
+      ctx.strokeStyle = '#f44336';
+      ctx.lineWidth = 2;
+    } else {
+      ctx.fillStyle = 'rgba(76, 175, 80, 0.6)';
+      ctx.strokeStyle = '#4caf50';
+      ctx.lineWidth = 2;
+    }
+    ctx.fill();
+    ctx.stroke();
+
+    // 标签
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 13px system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    const label = isStart ? '起点' : isEnd ? '终点' : node.label || node.id;
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    const tw = ctx.measureText(label).width;
+    const pad = 6;
+    ctx.fillRect(node.x - tw / 2 - pad, node.y - r - 28, tw + pad * 2, 24);
+    ctx.fillStyle = '#fff';
+    ctx.fillText(label, node.x, node.y - r - 8);
+
+    // 坐标文本
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.font = '11px monospace';
+    ctx.textBaseline = 'top';
+    ctx.fillText(`(${node.x}, ${node.y})`, node.x, node.y + r + 6);
+  }
+}
+
+// ====== 画布缩放适配 ======
+function resizeCanvas() {
+  const wrap = canvas.parentElement;
+  const wrapW = wrap.clientWidth;
+  const wrapH = window.innerHeight;
+  // 让图片尽可能填满，sidebar 320px + padding
+  const availW = wrapW - 4;
+  const availH = wrapH - 4;
+  const imgAspect = imgNaturalW / imgNaturalH;
+  const availAspect = availW / availH;
+  let drawW, drawH;
+  if (imgAspect > availAspect) {
+    drawW = availW;
+    drawH = availW / imgAspect;
+  } else {
+    drawH = availH;
+    drawW = availH * imgAspect;
+  }
+  scale = drawW / DESIGN_W;
+  canvas.width = DESIGN_W;
+  canvas.height = DESIGN_H;
+  canvas.style.width = drawW + 'px';
+  canvas.style.height = drawH + 'px';
+  render();
+}
+
+// ====== 节点管理 ======
+function getNodeId(type) {
+  if (type === 'deadend') return `dead_${nodes.filter(n => n.type === 'deadend').length + 1}`;
+  const corrects = nodes.filter(n => n.type === 'correct' && !['start','end'].includes(n.id));
+  return `node_${corrects.length + 1}`;
+}
+
+function addNode(x, y) {
+  // 检测是否点到了现有节点
+  const hit = hitTest(x, y);
+  if (hit) return hit;
+
+  if (currentMode === 'edge') {
+    setStatus('画路径模式：请点击两个已有节点来创建路径', '#2196f3');
+    return null;
+  }
+
+  let id, type, label = '';
+
+  if (currentMode === 'deadend') {
+    type = 'deadend';
+    id = getNodeId('deadend');
+    label = `死胡同${nodes.filter(n => n.type === 'deadend').length + 1}`;
+  } else {
+    type = 'correct';
+    if (nodes.filter(n => n.type === 'correct').length === 0) {
+      id = 'start';
+      label = '我的位置';
+    } else {
+      id = getNodeId('correct');
+      label = `节点${nodes.filter(n => n.type === 'correct').length}`;
+      // 检查是否已经有终点
+      if (nodes.some(n => n.id === 'start') && !nodes.some(n => n.id === 'end') &&
+          nodes.filter(n => n.type === 'correct').length >= 2) {
+        // 让用户选择是否是终点
+        if (confirm(`将此节点设为终点"希望小学"？\n点击"确定"=终点\n点击"取消"=普通节点`)) {
+          id = 'end';
+          label = '希望小学';
+        }
+      }
+    }
+  }
+
+  const node = { id, x, y, type, label };
+  nodes.push(node);
+  updateUI();
+  render();
+  setStatus(`已添加 ${label} (${x}, ${y})`, type === 'deadend' ? '#f44336' : '#4caf50');
+  return node;
+}
+
+function removeNode(id) {
+  // 删除关联路径
+  edges = edges.filter(e => e.fromId !== id && e.toId !== id);
+  nodes = nodes.filter(n => n.id !== id);
+  if (pendingEdgeStart === id) pendingEdgeStart = null;
+  updateUI();
+  render();
+  setStatus(`已删除节点 ${id}`, '#e55');
+}
+
+function hitTest(x, y, r = 22) {
+  for (let i = nodes.length - 1; i >= 0; i--) {
+    const n = nodes[i];
+    if (Math.hypot(n.x - x, n.y - y) < r) return n;
+  }
+  return null;
+}
+
+// ====== 路径管理 ======
+function startEdge(fromId) {
+  pendingEdgeStart = fromId;
+  setStatus(`已选中 ${nodes.find(n => n.id === fromId)?.label}，点击另一个节点完成路径`, '#2196f3');
+  render();
+}
+
+function completeEdge(toId) {
+  if (!pendingEdgeStart || pendingEdgeStart === toId) return;
+
+  // 检查是否重复
+  if (edges.some(e => e.fromId === pendingEdgeStart && e.toId === toId) ||
+      edges.some(e => e.fromId === toId && e.toId === pendingEdgeStart)) {
+    setStatus('路径已存在', '#e55');
+    pendingEdgeStart = null;
+    render();
+    return;
+  }
+
+  const from = nodes.find(n => n.id === pendingEdgeStart);
+  const to = nodes.find(n => n.id === toId);
+  const isCorrect = from.type === 'correct' && to.type === 'correct';
+
+  edges.push({ fromId: pendingEdgeStart, toId, isCorrect });
+  setStatus(`已添加路径：${from?.label} → ${to?.label}`, isCorrect ? '#4caf50' : '#f44336');
+  pendingEdgeStart = null;
+  updateUI();
+  render();
+}
+
+function removeEdge(fromId, toId) {
+  edges = edges.filter(e => !(e.fromId === fromId && e.toId === toId));
+  updateUI();
+  render();
+}
+
+// ====== 生成配置 ======
+function generateConfig() {
+  const correctOrder = nodes.filter(n => n.type === 'correct')
+    .sort((a, b) => {
+      // start 和 end 排首位和末位
+      if (a.id === 'start') return -1;
+      if (b.id === 'start') return 1;
+      if (a.id === 'end') return 1;
+      if (b.id === 'end') return -1;
+      return 0;
+    });
+
+  const result = {
+    nodeRadius: 50,
+    nodes: correctOrder.map(n => ({
+      id: n.id,
+      x: n.x,
+      y: n.y,
+      label: n.label,
+      type: n.type,
+    })),
+    deadEnds: nodes.filter(n => n.type === 'deadend').map(n => ({
+      id: n.id,
+      x: n.x,
+      y: n.y,
+    })),
+    correctPath: correctOrder.map(n => n.id),
+    edges: edges.map(e => ({
+      from: e.fromId,
+      to: e.toId,
+      isCorrect: e.isCorrect,
+    })),
+  };
+
+  return JSON.stringify(result, null, 2);
+}
+
+// ====== UI 更新 ======
+function updateUI() {
+  const correctNodes = nodes.filter(n => n.type === 'correct');
+  const deadendNodes = nodes.filter(n => n.type === 'deadend');
+
+  // 正确节点列表
+  const correctEl = document.getElementById('correctNodes');
+  if (correctNodes.length === 0) {
+    correctEl.innerHTML = '<div style="color:#666;font-size:12px;">暂无节点，点击地图添加</div>';
+  } else {
+    correctEl.innerHTML = correctNodes.map(n => {
+      const badge = n.id === 'start' ? '<span class="type-badge" style="background:#4caf50;color:#fff;">起点</span>'
+        : n.id === 'end' ? '<span class="type-badge" style="background:#f44336;color:#fff;">终点</span>'
+        : '<span class="type-badge" style="background:#2e7d32;color:#fff;">途径</span>';
+      return `<div class="node-item">${badge} <span>${n.label} (${n.id})</span><span class="coords">${n.x}, ${n.y}</span><button class="del-btn" data-action="del-node" data-id="${n.id}">×</button></div>`;
+    }).join('');
+  }
+
+  // 死胡同列表
+  const deadEl = document.getElementById('deadendNodes');
+  if (deadendNodes.length === 0) {
+    deadEl.innerHTML = '<div style="color:#666;font-size:12px;">暂无节点</div>';
+  } else {
+    deadEl.innerHTML = deadendNodes.map(n => {
+      return `<div class="node-item"><span class="type-badge" style="background:#f44336;color:#fff;">死胡同</span> <span>${n.label}</span><span class="coords">${n.x}, ${n.y}</span><button class="del-btn" data-action="del-node" data-id="${n.id}">×</button></div>`;
+    }).join('');
+  }
+
+  // 路径列表
+  const edgeEl = document.getElementById('edgeList');
+  if (edges.length === 0) {
+    edgeEl.innerHTML = '<div style="color:#666;font-size:12px;">暂无路径</div>';
+  } else {
+    edgeEl.innerHTML = edges.map(e => {
+      const from = nodes.find(n => n.id === e.fromId);
+      const to = nodes.find(n => n.id === e.toId);
+      const badge = e.isCorrect
+        ? '<span class="path-badge" style="background:#4caf50;color:#fff;">正确</span>'
+        : '<span class="path-badge" style="background:#f44336;color:#fff;">错误</span>';
+      return `<div class="edge-item">${badge} ${from?.label||e.fromId} → ${to?.label||e.toId}<button class="del-btn" data-action="del-edge" data-from="${e.fromId}" data-to="${e.toId}">×</button></div>`;
+    }).join('');
+  }
+
+  // 导出数据
+  document.getElementById('outputBox').textContent = generateConfig();
+}
+
+function setStatus(text, color = '#888') {
+  document.getElementById('statusText').textContent = text;
+}
+
+// ====== 事件 ======
+canvas.addEventListener('click', (e) => {
+  const pos = getLogicalPos(e);
+  const hit = hitTest(pos.x, pos.y);
+
+  if (currentMode === 'edge') {
+    if (hit) {
+      if (!pendingEdgeStart) {
+        startEdge(hit.id);
+      } else {
+        completeEdge(hit.id);
+      }
+    } else {
+      setStatus('点击节点来连接路径，不是空白区域', '#e55');
+    }
+  } else {
+    addNode(pos.x, pos.y);
+  }
+});
+
+canvas.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+  const pos = getLogicalPos(e);
+  const hit = hitTest(pos.x, pos.y);
+  if (hit) {
+    if (confirm(`删除节点 "${hit.label}" 及其关联路径？`)) {
+      removeNode(hit.id);
+    }
+  } else if (pendingEdgeStart) {
+    pendingEdgeStart = null;
+    setStatus('已取消路径连接', '#888');
+    render();
+  }
+});
+
+canvas.addEventListener('mousemove', (e) => {
+  const pos = getLogicalPos(e);
+  ctx.mouseX = pos.x;
+  ctx.mouseY = pos.y;
+  if (pendingEdgeStart) render();
+});
+
+// 模式切换
+document.querySelectorAll('[data-mode]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-mode]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentMode = btn.dataset.mode;
+    pendingEdgeStart = null;
+    const hints = {
+      correct: '<kbd>左键</kbd> 在地图路线上点击添加正确路径节点（第一点为起点，最后一点为终点）',
+      deadend: '<kbd>左键</kbd> 在死胡同岔路上点击添加死胡同节点',
+      edge: '<kbd>左键</kbd> 依次点击两个节点创建路径连接 · <kbd>右键</kbd> 取消',
+    };
+    document.getElementById('modeHelp').innerHTML = hints[currentMode];
+    setStatus(`切换到${btn.textContent}模式`, '#888');
+    render();
+  });
+});
+
+// 列表事件代理
+document.getElementById('correctNodes').addEventListener('click', handleListClick);
+document.getElementById('deadendNodes').addEventListener('click', handleListClick);
+document.getElementById('edgeList').addEventListener('click', handleListClick);
+
+function handleListClick(e) {
+  const btn = e.target.closest('.del-btn');
+  if (!btn) return;
+  const action = btn.dataset.action;
+  if (action === 'del-node') {
+    const id = btn.dataset.id;
+    if (confirm(`删除节点 ${id}？`)) removeNode(id);
+  } else if (action === 'del-edge') {
+    removeEdge(btn.dataset.from, btn.dataset.to);
+  }
+}
+
+// 复制
+document.getElementById('copyBtn').addEventListener('click', () => {
+  const text = generateConfig();
+  navigator.clipboard.writeText(text).then(() => {
+    setStatus('✅ 已复制到剪贴板！', '#4caf50');
+  }).catch(() => {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+    setStatus('✅ 已复制到剪贴板！', '#4caf50');
+  });
+});
+
+// ====== 图片加载 ======
+img.onload = () => {
+  imgNaturalW = img.naturalWidth;
+  imgNaturalH = img.naturalHeight;
+  resizeCanvas();
+  setStatus(`图片已加载 (${imgNaturalW}×${imgNaturalH})，点击地图添加起点`, '#4caf50');
+};
+
+img.onerror = () => {
+  document.getElementById('outputBox').textContent = '❌ 图片加载失败！请检查路径: ./美术素材/第三关/地图.png';
+  setStatus('图片加载失败', '#f44336');
+};
+
+window.addEventListener('resize', resizeCanvas);
+
+// ====== 键盘快捷键 ======
+document.addEventListener('keydown', (e) => {
+  if (e.key === '1') { document.querySelector('[data-mode="correct"]').click(); }
+  if (e.key === '2') { document.querySelector('[data-mode="deadend"]').click(); }
+  if (e.key === '3') { document.querySelector('[data-mode="edge"]').click(); }
+  if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
+    // 撤销 - 删除最后一个节点
+    if (nodes.length > 0) {
+      const last = nodes[nodes.length - 1];
+      removeNode(last.id);
+    }
+  }
+});
+</script>
+</body>
+</html>
